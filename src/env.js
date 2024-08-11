@@ -11,7 +11,6 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-    ISBN_AUTH: z.string(),
   },
 
   /**
@@ -21,6 +20,7 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_ISBN_AUTH: z.string(),
   },
 
   /**

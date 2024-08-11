@@ -58,7 +58,7 @@ export default function Home() {
 
   const headers = {
     "Content-Type": "application/json",
-    Authorization: env.ISBN_AUTH,
+    Authorization: env.NEXT_PUBLIC_ISBN_AUTH,
   };
 
   const getBook = async (book: string) => {
