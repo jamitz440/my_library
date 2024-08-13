@@ -4,7 +4,7 @@ import { env } from "~/env";
 export async function POST(request: NextRequest) {
   console.log("getBook api POST requested");
 
-  const body = await request.json();
+  const body = await request.text();
 
   console.log(body);
 
