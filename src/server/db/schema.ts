@@ -25,10 +25,14 @@ export const books = createTable(
   {
     id: serial("id").primaryKey(),
     title: varchar("title", { length: 256 }),
-    author: varchar("author", { length: 256 }),
+    user_id: varchar("user_id", { length: 256 }),
+    rating: integer("rating"),
+    review: text("review"),
+    authors: text("authors").array(),
     pages: integer("pages"),
-    published: integer("published"),
+    published: varchar("published", { length: 256 }),
     synopsis: text("synopsis"),
+    image: varchar("image"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),

@@ -1,8 +1,22 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BarcodeScanner } from "react-barcode-scanner";
 import "react-barcode-scanner/polyfill";
-import { env } from "~/env";
+import { SignInButton, SignOutButton } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "~/components/ui/dialog";
+import { Button } from "~/components/ui/button";
+import { useToast } from "~/components/ui/use-toast";
+import { useBookStore } from "~/state/bookStore";
+import { MenuBar } from "~/components/ui/MenuBar";
+import { NavBar } from "~/components/ui/NavBar";
 
 interface DimensionsStructured {
   length: {
@@ -23,7 +37,7 @@ interface DimensionsStructured {
   };
 }
 
-interface Book {
+export interface Book {
   publisher: string;
   synopsis: string;
   language: string;
@@ -52,20 +66,19 @@ interface BarcodeData {
 }
 
 export default function Home() {
-  const [text, setText] = useState("");
+  const [book, setBook] = useState<Book | null>();
   const [image, setImage] = useState("");
   const [open, setOpen] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const [library, setLibrary] = useState<Book[]>([]);
+  const { toast } = useToast();
+  const libraryStore = useBookStore();
 
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: env.NEXT_PUBLIC_ISBN_AUTH,
-  };
+  const { isLoaded, isSignedIn, user } = useUser();
 
   const getBook = async (book: string) => {
     try {
-      const res = await fetch(`https://api2.isbndb.com/book/${book}`, {
-        headers: headers,
-      });
+      const res = await fetch("api/getBook", { method: "POST", body: book });
 
       if (!res.ok) {
         throw new Error("Network response was not ok");
@@ -73,17 +86,89 @@ export default function Home() {
 
       const data = (await res.json()) as Data;
 
-      setText(data.book.title); // No need for await here
-      setImage(data.book.image); // No need for await here
+      console.log(data);
+
+      setBook(data.book);
+      setImage(data.book.image);
       setOpen(false);
-      console.log(data); // No need for await here
+      setDialog(true);
     } catch (error) {
       console.error("Failed to fetch book data:", error);
+      setBook(null);
     }
+  };
+
+  useEffect(() => {
+    libraryStore.getBooks().catch((e) => {
+      console.log(e);
+    });
+    setLibrary(libraryStore.books);
+  }, [library]);
+
+  const handleAdd = () => {
+    const res = fetch("api/addToLibrary", {
+      method: "POST",
+      body: JSON.stringify({ book: book, user_id: user?.id }),
+    });
+    toast({
+      title: `Added to Library`,
+      description: `${book?.title} - ${book?.authors[0]}`,
+    });
+    libraryStore.getBooks().catch((e) => console.log(e));
+    setDialog(false);
+  };
+
+  const handleReset = () => {
+    setBook(null);
+    setDialog(false);
+    setOpen(true);
   };
 
   return (
     <div className="App">
+      <NavBar />
+
+      <Dialog open={dialog}>
+        <DialogContent
+          onPointerDownOutside={() => {
+            setDialog(false);
+            setOpen(true);
+          }}
+        >
+          <DialogClose onClick={() => setDialog(false)} />
+          <DialogHeader>
+            <DialogTitle> Is this the correct book? </DialogTitle>
+          </DialogHeader>
+          <div className="flex w-full gap-4">
+            <div className="relative aspect-book h-52 w-auto overflow-hidden rounded-md">
+              {book && (
+                <Image layout="fill" src={book.image} alt={book.title} />
+              )}
+            </div>
+            <div className="flex flex-col">
+              <div className="text-lg font-bold">{book?.title}</div>
+              <div className="text-lg">{book?.authors}</div>
+              <div className="text mt-4">Published: {book?.date_published}</div>
+              <div className="textlg">Pages: {book?.pages}</div>
+            </div>
+          </div>
+          <div className="flex w-full justify-around gap-4">
+            <Button
+              variant={"secondary"}
+              onClick={handleReset}
+              className="w-full"
+            >
+              No, that's not right!
+            </Button>
+            <Button className="w-full" onClick={handleAdd}>
+              That's the one!{" "}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <SignInButton />
+      <SignOutButton />
+      <div>user id : {user?.id}</div>
       <button onClick={() => setOpen(!open)}>Scan Book</button>
       {open && (
         <BarcodeScanner
@@ -91,8 +176,7 @@ export default function Home() {
           options={{ formats: ["ean_13"] }}
         />
       )}
-      <div>Results: {text}</div>
-      {image && <img src={image} alt="Book Cover" />}
+      <MenuBar currentPage="Home" />
     </div>
   );
 }
