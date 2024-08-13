@@ -46,7 +46,7 @@ export interface Book {
   dimensions: string; // This can be a more complex structure if needed
   dimensions_structured: DimensionsStructured;
   pages: number;
-  date_published: number;
+  date_published: string;
   subjects: string[];
   authors: string[];
   title: string;
@@ -158,10 +158,10 @@ export default function Home() {
               onClick={handleReset}
               className="w-full"
             >
-              No, that's not right!
+              {`No, that's not right!`}
             </Button>
             <Button className="w-full" onClick={handleAdd}>
-              That's the one!{" "}
+              {`That's the one! `}
             </Button>
           </div>
         </DialogContent>

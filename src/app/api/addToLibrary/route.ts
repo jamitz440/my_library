@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { books } from "~/server/db/schema";
 import { db } from "~/server/db";
-import { NextRequest } from "next/server";
-import { Book } from "~/app/page";
+import { type NextRequest } from "next/server";
+import { type Book } from "~/app/page";
 
 interface BookData {
   book: Book;

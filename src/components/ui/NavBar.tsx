@@ -1,4 +1,7 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  FontAwesomeIcon,
+  type FontAwesomeIconProps,
+} from "@fortawesome/react-fontawesome";
 import { faBooks } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
 import Link from "next/link";
 
@@ -10,7 +13,10 @@ export const NavBar = () => {
           href="/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
         >
-          <FontAwesomeIcon icon={faBooks} className="h-8" />
+          <FontAwesomeIcon
+            icon={faBooks as FontAwesomeIconProps["icon"]}
+            className="h-8"
+          />
           <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
             My Library
           </span>

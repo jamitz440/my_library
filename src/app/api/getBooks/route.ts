@@ -1,9 +1,8 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { db } from "~/server/db";
 import { books } from "~/server/db/schema";
-import { eq } from "drizzle-orm";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   console.log("getBooks api GET requested");
   try {
     const res = await db.select().from(books);

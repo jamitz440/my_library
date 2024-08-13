@@ -2,6 +2,7 @@ import {
   FontAwesomeIcon,
   type FontAwesomeIconProps,
 } from "@fortawesome/react-fontawesome";
+import { type IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faBooks,
   faHouse,
@@ -11,12 +12,30 @@ import {
 } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
 import Link from "next/link";
 
-const pages = [
-  { name: "Home", icon: faHouse, link: "/" },
-  { name: "TBR", icon: faBookmark, link: "/tbr" },
-  { name: "Add", icon: faPlus, link: "/" },
-  { name: "Library", icon: faBooks, link: "/library" },
-  { name: "Profile", icon: faUser, link: "/profile" },
+type Page = {
+  name: string;
+  icon: FontAwesomeIconProps["icon"];
+  link: string;
+};
+
+const pages: Page[] = [
+  { name: "Home", icon: faHouse as FontAwesomeIconProps["icon"], link: "/" },
+  {
+    name: "TBR",
+    icon: faBookmark as FontAwesomeIconProps["icon"],
+    link: "/tbr",
+  },
+  { name: "Add", icon: faPlus as FontAwesomeIconProps["icon"], link: "/" },
+  {
+    name: "Library",
+    icon: faBooks as FontAwesomeIconProps["icon"],
+    link: "/library",
+  },
+  {
+    name: "Profile",
+    icon: faUser as FontAwesomeIconProps["icon"],
+    link: "/profile",
+  },
 ];
 
 export const MenuBar = ({
@@ -31,7 +50,7 @@ export const MenuBar = ({
           page.name == "Add" ? (
             <Link
               key={`${page.name}-menu-button`}
-              href="/add"
+              href={page.link}
               className="mx-auto my-auto flex h-16 w-16 -translate-y-2 items-center justify-center rounded-full bg-blue-400"
             >
               <FontAwesomeIcon

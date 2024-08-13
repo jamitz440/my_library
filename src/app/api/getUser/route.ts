@@ -1,7 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import { currentUser } from "@clerk/nextjs/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   console.log("getBooks api GET requested");
   try {
     const user = await currentUser();
