@@ -23,7 +23,7 @@ const pages: Page[] = [
   {
     name: "TBR",
     icon: faBookmark as FontAwesomeIconProps["icon"],
-    link: "/tbr",
+    link: "/",
   },
   { name: "Add", icon: faPlus as FontAwesomeIconProps["icon"], link: "/" },
   {

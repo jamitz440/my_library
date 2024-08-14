@@ -35,7 +35,7 @@ export const NavBar = () => {
             </li>
             <li>
               <Link
-                href="/tbr"
+                href="/"
                 className="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-blue-700 sm:dark:hover:bg-transparent sm:dark:hover:text-blue-500"
               >
                 TBR
