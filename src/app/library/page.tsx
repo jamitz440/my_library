@@ -1,10 +1,10 @@
 "use client";
 import { useEffect } from "react";
 import { useBookStore } from "~/state/bookStore";
-import { type Book } from "../page";
-import Image from "next/image";
 import { MenuBar } from "~/components/ui/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
+import { BookOverview } from "~/components/ui/BookOverview";
+import Image from "next/image"; // Assuming Image import is missing in your code
 
 export default function Library() {
   const bookStore = useBookStore();
@@ -26,7 +26,7 @@ export default function Library() {
   );
 }
 
-const BookOverview = ({ book }: { book: Book }) => {
+const BookOverview = ({ book }) => {
   return (
     <div
       key={book.title}
