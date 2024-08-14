@@ -1,7 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { BarcodeScanner } from "react-barcode-scanner";
+import dynamic from "next/dynamic";
 import "react-barcode-scanner/polyfill";
+
+const BarcodeScanner = dynamic(
+  () => import("react-barcode-scanner").then((mod) => mod.BarcodeScanner),
+  { ssr: false },
+);
 import { SignInButton, SignOutButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
