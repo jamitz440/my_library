@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import "react-barcode-scanner/polyfill";
 
 const BarcodeScanner = dynamic(
   () => import("react-barcode-scanner").then((mod) => mod.BarcodeScanner),
