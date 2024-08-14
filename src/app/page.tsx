@@ -8,6 +8,8 @@ const BarcodeScanner = dynamic(
 );
 import { SignInButton, SignOutButton } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import { Input } from "~/components/ui/input";
+
 import Image from "next/image";
 import {
   Dialog,
@@ -65,6 +67,10 @@ interface Data {
   book: Book;
 }
 
+interface Res {
+  data: Book[];
+}
+
 interface BarcodeData {
   rawValue: string;
 }
@@ -74,9 +80,10 @@ export default function Home() {
   const [image, setImage] = useState("");
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState(false);
-  const [library, setLibrary] = useState<Book[]>([]);
   const { toast } = useToast();
   const libraryStore = useBookStore();
+  const [search, setSearch] = useState<string>("");
+  const [results, setResults] = useState<Book[]>();
 
   const { isLoaded, isSignedIn, user } = useUser();
 
@@ -102,13 +109,6 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    libraryStore.getBooks().catch((e) => {
-      console.log(e);
-    });
-    setLibrary(libraryStore.books);
-  }, [library]);
-
   const handleAdd = () => {
     const res = fetch("api/addToLibrary", {
       method: "POST",
@@ -128,9 +128,37 @@ export default function Home() {
     setOpen(true);
   };
 
+  const handleSearch = async () => {
+    if (search === "") {
+      return;
+    }
+    const res = await fetch("api/searchBooks", {
+      method: "POST",
+      body: search,
+    });
+
+    if (!res.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = (await res.json()) as Res;
+
+    setResults(data.data);
+  };
+
   return (
     <div className="App">
       <NavBar />
+      <div className="flex gap-4">
+        <Input
+          className="w-1/2"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }}
+        />
+        <Button onClick={handleSearch}>Search</Button>
+      </div>
 
       <Dialog open={dialog}>
         <DialogContent
@@ -165,21 +193,33 @@ export default function Home() {
               {`No, that's not right!`}
             </Button>
             <Button className="w-full" onClick={handleAdd}>
-              {`That's the one! `}
+              {`Add to MyLibrary! `}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
-      <SignInButton />
-      <SignOutButton />
-      <div>user id : {user?.id}</div>
-      <button onClick={() => setOpen(!open)}>Scan Book</button>
-      {open && (
-        <BarcodeScanner
-          onCapture={(i: BarcodeData) => getBook(i.rawValue)}
-          options={{ formats: ["ean_13"] }}
-        />
-      )}
+      {
+        // <SignInButton />
+        // <SignOutButton />
+        // <div>user id : {user?.id}</div>
+        // <button onClick={() => setOpen(!open)}>Scan Book</button>
+        // {open && (
+        //   <BarcodeScanner
+        //     onCapture={(i: BarcodeData) => getBook(i.rawValue)}
+        //     options={{ formats: ["ean_13"] }}
+        //   />
+        // )}
+      }
+      <div className="flex flex-grow flex-wrap">
+        {results
+          ? results.map((book) => (
+              <div key={book.isbn13}>
+                <img src={book.image} className="h-96 w-auto" />
+                <div>{book.title} </div>
+              </div>
+            ))
+          : ""}
+      </div>
       <MenuBar currentPage="Home" />
     </div>
   );
