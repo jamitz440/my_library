@@ -1,10 +1,9 @@
 "use client";
 import { useEffect } from "react";
 import { useBookStore } from "~/state/bookStore";
-import { type Book } from "../page";
-import Image from "next/image";
 import { MenuBar } from "~/components/ui/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
+import { BookOverview } from "~/components/ui/BookOverview";
 
 export default function Library() {
   const bookStore = useBookStore();
@@ -25,29 +24,3 @@ export default function Library() {
     </div>
   );
 }
-
-const BookOverview = ({ book }: { book: Book }) => {
-  return (
-    <div
-      key={book.title}
-      className="flex flex-col items-center justify-between gap-2 p-2"
-    >
-      <div className="aspect-book relative h-auto w-full overflow-hidden rounded-md">
-        <Image
-          className="h-auto"
-          src={book.image}
-          layout="fill"
-          alt={book.title}
-        />
-      </div>
-      <div className="mb-auto w-full">
-        <div className="mb-auto w-auto text-sm font-bold sm:text-base md:text-lg">
-          {book.title}
-        </div>
-        <div className="mb-auto w-auto text-xs text-zinc-400 sm:text-sm md:text-base lg:text-lg">
-          {book.authors[0]}
-        </div>
-      </div>
-    </div>
-  );
-};

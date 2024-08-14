@@ -14,6 +14,7 @@ const config = {
       },
     ],
   },
+  productionBrowserSourceMaps: true,
 };
 
 export default config;
