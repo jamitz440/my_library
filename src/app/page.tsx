@@ -152,13 +152,18 @@ export default function Home() {
     setResults(data.data);
   };
 
+  interface Stats { 
+    books: string;
+    authors: string;
+  }
+
   useEffect(() => {
     const getStats = async () => {
       const res = await fetch("api/getStats");
-      const data = await res.json();
+      const data = await res.json() as Stats;
       setStats(data);
     };
-    getStats();
+    getStats().catch(e => console.log(e));
   }, []);
 
   return (
