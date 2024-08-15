@@ -4,6 +4,8 @@ import {
 } from "@fortawesome/react-fontawesome";
 import { faBooks } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
+import { SignInButton } from "@clerk/nextjs";
 
 export const NavBar = () => {
   return (
@@ -50,16 +52,29 @@ export const NavBar = () => {
               </Link>
             </li>
             <li>
-              <Link
-                href="/profile"
-                className="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-blue-700 sm:dark:hover:bg-transparent sm:dark:hover:text-blue-500"
-              >
-                Profile
-              </Link>
+              <ProfileButton />
             </li>
           </ul>
         </div>
       </div>
     </nav>
+  );
+};
+
+const ProfileButton = () => {
+  const { isSignedIn } = useUser();
+  return isSignedIn ? (
+    <Link
+      href="/profile"
+      className="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-blue-700 sm:dark:hover:bg-transparent sm:dark:hover:text-blue-500"
+    >
+      Profile
+    </Link>
+  ) : (
+    <SignInButton>      
+      <div className=" cursor-pointer select-none block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-blue-700 sm:dark:hover:bg-transparent sm:dark:hover:text-blue-500">
+        Sign In
+      </div>
+    </SignInButton>
   );
 };

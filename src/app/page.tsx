@@ -75,6 +75,11 @@ interface BarcodeData {
   rawValue: string;
 }
 
+interface Stats {
+  books: string;
+  authors: string;
+}
+
 export default function Home() {
   const [book, setBook] = useState<Book | null>();
   const [image, setImage] = useState("");
@@ -84,6 +89,7 @@ export default function Home() {
   const libraryStore = useBookStore();
   const [search, setSearch] = useState<string>("");
   const [results, setResults] = useState<Book[]>();
+  const [stats, setStats] = useState<Stats>();
 
   const { isLoaded, isSignedIn, user } = useUser();
 
@@ -146,79 +152,108 @@ export default function Home() {
     setResults(data.data);
   };
 
+  useEffect(() => {
+    const getStats = async () => {
+      const res = await fetch("api/getStats");
+      const data = await res.json();
+      setStats(data);
+    };
+    getStats();
+  }, []);
+
   return (
     <div className="App">
       <NavBar />
-      <div className="flex gap-4">
-        <Input
-          className="w-1/2"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-          }}
-        />
-        <Button onClick={handleSearch}>Search</Button>
-      </div>
+      <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
+        
+        <div className="mb-4 grid w-full grid-cols-2 items-center justify-center gap-4">
+          <div className="flex flex-col items-center justify-center rounded-2xl bg-zinc-200 py-16 text-lg">
+            <div className="text-6xl font-bold">
+              {stats?.books.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+            </div>
+            <div>Books to search</div>
+          </div>
+          <div className="flex flex-col items-center justify-center rounded-2xl bg-zinc-200 py-16 text-lg">
+            <div className="text-6xl font-bold">
+              {stats?.authors.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+            </div>
+            <div>Authors availiable</div>
+          </div>
+        </div>
 
-      <Dialog open={dialog}>
-        <DialogContent
-          onPointerDownOutside={() => {
-            setDialog(false);
-            setOpen(true);
-          }}
-        >
-          <DialogClose onClick={() => setDialog(false)} />
-          <DialogHeader>
-            <DialogTitle> Is this the correct book? </DialogTitle>
-          </DialogHeader>
-          <div className="flex w-full gap-4">
-            <div className="relative aspect-book h-52 w-auto overflow-hidden rounded-md">
-              {book && (
-                <Image layout="fill" src={book.image} alt={book.title} />
-              )}
-            </div>
-            <div className="flex flex-col">
-              <div className="text-lg font-bold">{book?.title}</div>
-              <div className="text-lg">{book?.authors}</div>
-              <div className="text mt-4">Published: {book?.date_published}</div>
-              <div className="textlg">Pages: {book?.pages}</div>
-            </div>
-          </div>
-          <div className="flex w-full justify-around gap-4">
-            <Button
-              variant={"secondary"}
-              onClick={handleReset}
-              className="w-full"
-            >
-              {`No, that's not right!`}
-            </Button>
-            <Button className="w-full" onClick={handleAdd}>
-              {`Add to MyLibrary! `}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      {
-        // <SignInButton />
-        // <SignOutButton />
-        // <div>user id : {user?.id}</div>
-        // <button onClick={() => setOpen(!open)}>Scan Book</button>
-        // {open && (
-        //   <BarcodeScanner
-        //     onCapture={(i: BarcodeData) => getBook(i.rawValue)}
-        //     options={{ formats: ["ean_13"] }}
-        //   />
-        // )}
-      }
-      <div className="flex flex-grow flex-wrap">
-        {results
-          ? results.map((book) => (
-              <div key={book.isbn13}>
-                <img src={book.image} className="h-96 w-auto" />
-                <div>{book.title} </div>
+        <div className="flex w-full items-center justify-center gap-4">
+          <Input
+            className="w-1/2"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+          />
+          <Button onClick={handleSearch}>Search</Button>
+        </div>
+
+        <Dialog open={dialog}>
+          <DialogContent
+            onPointerDownOutside={() => {
+              setDialog(false);
+              setOpen(true);
+            }}
+          >
+            <DialogClose onClick={() => setDialog(false)} />
+            <DialogHeader>
+              <DialogTitle> Is this the correct book? </DialogTitle>
+            </DialogHeader>
+            <div className="flex w-full gap-4">
+              <div className="relative aspect-book h-52 w-auto overflow-hidden rounded-md">
+                {book && (
+                  <Image layout="fill" src={book.image} alt={book.title} />
+                )}
               </div>
-            ))
-          : ""}
+              <div className="flex flex-col">
+                <div className="text-lg font-bold">{book?.title}</div>
+                <div className="text-lg">{book?.authors}</div>
+                <div className="text mt-4">
+                  Published: {book?.date_published}
+                </div>
+                <div className="textlg">Pages: {book?.pages}</div>
+              </div>
+            </div>
+            <div className="flex w-full justify-around gap-4">
+              <Button
+                variant={"secondary"}
+                onClick={handleReset}
+                className="w-full"
+              >
+                {`No, that's not right!`}
+              </Button>
+              <Button className="w-full" onClick={handleAdd}>
+                {`Add to MyLibrary! `}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+        {
+          // <SignInButton />
+          // <SignOutButton />
+          // <div>user id : {user?.id}</div>
+          // <button onClick={() => setOpen(!open)}>Scan Book</button>
+          // {open && (
+          //   <BarcodeScanner
+          //     onCapture={(i: BarcodeData) => getBook(i.rawValue)}
+          //     options={{ formats: ["ean_13"] }}
+          //   />
+          // )}
+        }
+        <div className="flex flex-grow flex-wrap">
+          {results
+            ? results.map((book) => (
+                <div key={book.isbn13}>
+                  <img src={book.image} className="h-96 w-auto" />
+                  <div>{book.title} </div>
+                </div>
+              ))
+            : ""}
+        </div>
       </div>
       <MenuBar currentPage="Home" />
     </div>
