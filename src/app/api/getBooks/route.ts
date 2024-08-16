@@ -9,7 +9,7 @@ export async function GET() {
     // .where(eq(books.user_id, "user_2kZTQnYmZdIdNX7cMq3vmpT3QUe"));
 
     const data = JSON.stringify(res);
-
+    
     return new NextResponse(data, {
       status: 200,
       headers: { "Content-Type": "application/json" },

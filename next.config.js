@@ -12,6 +12,10 @@ const config = {
         protocol: "https",
         hostname: "images.isbndb.com",
       },
+      {
+        protocol: "https",
+        hostname: "covers.openlibrary.org",
+      },
     ],
   },
   productionBrowserSourceMaps: true,

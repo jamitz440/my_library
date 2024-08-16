@@ -23,6 +23,7 @@ import { useToast } from "~/components/ui/use-toast";
 import { useBookStore } from "~/state/bookStore";
 import { MenuBar } from "~/components/ui/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
+import { BookOverview } from "~/components/ui/BookOverview";
 
 interface DimensionsStructured {
   length: {
@@ -88,6 +89,7 @@ export default function Home() {
   const { toast } = useToast();
   const libraryStore = useBookStore();
   const [search, setSearch] = useState<string>("");
+  const [authorSearch, setAuthorSearch] = useState<string>("");
   const [results, setResults] = useState<Book[]>();
   const [stats, setStats] = useState<Stats>();
 
@@ -102,8 +104,6 @@ export default function Home() {
       }
 
       const data = (await res.json()) as Data;
-
-      console.log(data);
 
       setBook(data.book);
       setImage(data.book.image);
@@ -140,7 +140,7 @@ export default function Home() {
     }
     const res = await fetch("api/searchBooks", {
       method: "POST",
-      body: search,
+      body: JSON.stringify({ title: search, author: authorSearch }),
     });
 
     if (!res.ok) {
@@ -149,10 +149,11 @@ export default function Home() {
 
     const data = (await res.json()) as Res;
 
+
     setResults(data.data);
   };
 
-  interface Stats { 
+  interface Stats {
     books: string;
     authors: string;
   }
@@ -160,17 +161,18 @@ export default function Home() {
   useEffect(() => {
     const getStats = async () => {
       const res = await fetch("api/getStats");
-      const data = await res.json() as Stats;
+      const data = (await res.json()) as Stats;
       setStats(data);
     };
-    getStats().catch(e => console.log(e));
+    getStats().catch((e) => console.log(e));
   }, []);
+
+  
 
   return (
     <div className="App">
       <NavBar />
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
-        
         <div className="mb-4 grid w-full grid-cols-2 items-center justify-center gap-4">
           <div className="flex flex-col items-center justify-center rounded-2xl bg-zinc-200 py-16 text-lg">
             <div className="text-6xl font-bold">
@@ -187,13 +189,24 @@ export default function Home() {
         </div>
 
         <div className="flex w-full items-center justify-center gap-4">
-          <Input
-            className="w-1/2"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-            }}
-          />
+          <div className="flex w-1/2 flex-col gap-4">
+            <Input
+              className="w-full"
+              value={search}
+              placeholder="Title"
+              onChange={(e) => {
+                setSearch(e.target.value);
+              }}
+            />
+            <Input
+              className="w-full"
+              placeholder="Author"
+              value={authorSearch}
+              onChange={(e) => {
+                setAuthorSearch(e.target.value);
+              }}
+            />
+          </div>
           <Button onClick={handleSearch}>Search</Button>
         </div>
 
@@ -206,7 +219,11 @@ export default function Home() {
           >
             <DialogClose onClick={() => setDialog(false)} />
             <DialogHeader>
-              <DialogTitle> Is this the correct book? </DialogTitle>
+              <DialogTitle>
+                {search
+                  ? "Add this book to your library?"
+                  : "Is this the correct book?"}
+              </DialogTitle>
             </DialogHeader>
             <div className="flex w-full gap-4">
               <div className="relative aspect-book h-52 w-auto overflow-hidden rounded-md">
@@ -250,14 +267,48 @@ export default function Home() {
           // )}
         }
         <div className="flex flex-grow flex-wrap">
-          {results
-            ? results.map((book) => (
-                <div key={book.isbn13}>
-                  <img src={book.image} className="h-96 w-auto" />
-                  <div>{book.title} </div>
-                </div>
-              ))
-            : ""}
+          {results ? (
+            <div className="mb-16 grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+              {results
+                .reduce((uniqueBooks:Book[], b:Book) => {
+                  const existingBook  = uniqueBooks.find(
+                    (ub : Book) =>
+                      ub.title === b.title &&
+                      ub.authors.join("") === b.authors.join(""),
+                  );
+                  if (!existingBook) {
+                    uniqueBooks.push(b);
+                  } else {
+                    if (BigInt(b.isbn13) > BigInt(existingBook.isbn13)) {
+                      uniqueBooks.splice(
+                        uniqueBooks.indexOf(existingBook),
+                        1,
+                        b,
+                      );
+                    }
+                  }
+                  return uniqueBooks;
+                }, [])
+                .map((b : Book) => (
+                  <div
+                    className=""
+                    key={b.isbn13}
+                    onClick={() => getBook(b.isbn13)}
+                  >
+                    <BookOverview book={b}>
+                      <div
+                        key={`${b.isbn13}-Selector`}
+                        className="absolute top-0 flex h-full w-full select-none items-center justify-center bg-zinc-500/80 p-2 text-lg font-bold text-white opacity-0 transition-opacity duration-150 hover:cursor-pointer group-hover:opacity-100"
+                      >
+                        Add to library
+                      </div>
+                    </BookOverview>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            ""
+          )}
         </div>
       </div>
       <MenuBar currentPage="Home" />

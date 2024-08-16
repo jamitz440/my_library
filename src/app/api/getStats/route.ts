@@ -14,7 +14,7 @@ export async function GET(){
           };
         const res = await fetch('https://api2.isbndb.com/stats', {headers:headers})
         const data = await res.json() as Stats
-        console.log(data)
+        
         return new NextResponse(JSON.stringify(data), {status:200, headers:{'Content-Type':'application/json'}})
     }catch(err){
         console.log(err)
