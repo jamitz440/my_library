@@ -1,3 +1,4 @@
+"use client";
 import {
   FontAwesomeIcon,
   type FontAwesomeIconProps,
@@ -6,8 +7,10 @@ import { faBooks } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { SignInButton } from "@clerk/nextjs";
+import React from "react";
 
 export const NavBar = () => {
+  const MemoizedProfileButton = React.memo(ProfileButton);
   return (
     <nav className="border-gray-200 bg-white dark:bg-gray-900">
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
@@ -52,7 +55,7 @@ export const NavBar = () => {
               </Link>
             </li>
             <li>
-              <ProfileButton />
+              <MemoizedProfileButton />
             </li>
           </ul>
         </div>
@@ -71,8 +74,8 @@ const ProfileButton = () => {
       Profile
     </Link>
   ) : (
-    <SignInButton>      
-      <div className=" cursor-pointer select-none block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-blue-700 sm:dark:hover:bg-transparent sm:dark:hover:text-blue-500">
+    <SignInButton>
+      <div className="block cursor-pointer select-none rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-blue-700 sm:dark:hover:bg-transparent sm:dark:hover:text-blue-500">
         Sign In
       </div>
     </SignInButton>

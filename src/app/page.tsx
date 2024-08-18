@@ -6,9 +6,37 @@ const BarcodeScanner = dynamic(
   () => import("react-barcode-scanner").then((mod) => mod.BarcodeScanner),
   { ssr: false },
 );
-import { SignInButton, SignOutButton } from "@clerk/nextjs";
+const DynamicPolyfill = dynamic(
+  () =>
+    import("react-barcode-scanner/polyfill").then((module) => {
+      // This function will be called when the module is loaded
+      // We don't need to return anything since it's not a component
+      return () => null;
+    }),
+  { ssr: false },
+);
+
 import { useUser } from "@clerk/nextjs";
 import { Input } from "~/components/ui/input";
+import { getStats } from "~/server/actions";
+import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import {
+  Label,
+  PolarGrid,
+  PolarRadiusAxis,
+  RadialBar,
+  RadialBarChart,
+} from "recharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { ChartConfig, ChartContainer } from "~/components/ui/chart";
 
 import Image from "next/image";
 import {
@@ -76,11 +104,6 @@ interface BarcodeData {
   rawValue: string;
 }
 
-interface Stats {
-  books: string;
-  authors: string;
-}
-
 export default function Home() {
   const [book, setBook] = useState<Book | null>();
   const [image, setImage] = useState("");
@@ -91,9 +114,9 @@ export default function Home() {
   const [search, setSearch] = useState<string>("");
   const [authorSearch, setAuthorSearch] = useState<string>("");
   const [results, setResults] = useState<Book[]>();
-  const [stats, setStats] = useState<Stats>();
 
   const { isLoaded, isSignedIn, user } = useUser();
+  const queryClient = useQueryClient();
 
   const getBook = async (book: string) => {
     try {
@@ -115,8 +138,8 @@ export default function Home() {
     }
   };
 
-  const handleAdd = () => {
-    const res = fetch("api/addToLibrary", {
+  const handleAdd = async () => {
+    const res = await fetch("api/addToLibrary", {
       method: "POST",
       body: JSON.stringify({ book: book, user_id: user?.id }),
     });
@@ -124,7 +147,8 @@ export default function Home() {
       title: `Added to Library`,
       description: `${book?.title} - ${book?.authors[0]}`,
     });
-    libraryStore.getBooks().catch((e) => console.log(e));
+    await queryClient.invalidateQueries({ queryKey: ["books"] });
+    await queryClient.invalidateQueries({ queryKey: ["stats"] });
     setDialog(false);
   };
 
@@ -149,47 +173,17 @@ export default function Home() {
 
     const data = (await res.json()) as Res;
 
-
     setResults(data.data);
   };
-
-  interface Stats {
-    books: string;
-    authors: string;
-  }
-
-  useEffect(() => {
-    const getStats = async () => {
-      const res = await fetch("api/getStats");
-      const data = (await res.json()) as Stats;
-      setStats(data);
-    };
-    getStats().catch((e) => console.log(e));
-  }, []);
-
-  
 
   return (
     <div className="App">
       <NavBar />
-      <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
-        <div className="mb-4 grid w-full grid-cols-2 items-center justify-center gap-4">
-          <div className="flex flex-col items-center justify-center rounded-2xl bg-zinc-200 py-16 text-lg">
-            <div className="text-6xl font-bold">
-              {stats?.books.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-            </div>
-            <div>Books to search</div>
-          </div>
-          <div className="flex flex-col items-center justify-center rounded-2xl bg-zinc-200 py-16 text-lg">
-            <div className="text-6xl font-bold">
-              {stats?.authors.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-            </div>
-            <div>Authors availiable</div>
-          </div>
-        </div>
+      <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-center p-4">
+        <StatsSection />
 
         <div className="flex w-full items-center justify-center gap-4">
-          <div className="flex w-1/2 flex-col gap-4">
+          <div className="flex flex-col gap-4 lg:w-1/2">
             <Input
               className="w-full"
               value={search}
@@ -207,7 +201,12 @@ export default function Home() {
               }}
             />
           </div>
-          <Button onClick={handleSearch}>Search</Button>
+          <div className="flex flex-col gap-4">
+            <Button onClick={handleSearch}>Search</Button>
+            <Button variant={"secondary"} onClick={() => setOpen(true)}>
+              Scan
+            </Button>
+          </div>
         </div>
 
         <Dialog open={dialog}>
@@ -254,27 +253,28 @@ export default function Home() {
             </div>
           </DialogContent>
         </Dialog>
-        {
-          // <SignInButton />
-          // <SignOutButton />
-          // <div>user id : {user?.id}</div>
-          // <button onClick={() => setOpen(!open)}>Scan Book</button>
-          // {open && (
-          //   <BarcodeScanner
-          //     onCapture={(i: BarcodeData) => getBook(i.rawValue)}
-          //     options={{ formats: ["ean_13"] }}
-          //   />
-          // )}
-        }
+
+        {open && (
+          <>
+            <DynamicPolyfill />
+            <BarcodeScanner
+              onCapture={(i: BarcodeData) => getBook(i.rawValue)}
+              options={{ formats: ["ean_13"] }}
+            />
+          </>
+        )}
+
         <div className="flex flex-grow flex-wrap">
           {results ? (
             <div className="mb-16 grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {results
-                .reduce((uniqueBooks:Book[], b:Book) => {
-                  const existingBook  = uniqueBooks.find(
-                    (ub : Book) =>
+                .reduce((uniqueBooks: Book[], b: Book) => {
+                  const existingBook = uniqueBooks.find(
+                    (ub: Book) =>
                       ub.title === b.title &&
-                      ub.authors.join("") === b.authors.join(""),
+                      Array.isArray(b.authors) &&
+                      Array.isArray(ub.authors) &&
+                      b.authors.join("") === ub.authors.join(""),
                   );
                   if (!existingBook) {
                     uniqueBooks.push(b);
@@ -289,7 +289,7 @@ export default function Home() {
                   }
                   return uniqueBooks;
                 }, [])
-                .map((b : Book) => (
+                .map((b: Book) => (
                   <div
                     className=""
                     key={b.isbn13}
@@ -315,3 +315,111 @@ export default function Home() {
     </div>
   );
 }
+
+const StatsSection = () => {
+  interface Stats {
+    totalBooks: number;
+    readBooks: number;
+  }
+
+  const { data, error, isFetched, isLoading } = useQuery({
+    queryKey: ["stats"],
+    queryFn: async () => {
+      const result = await getStats();
+      return JSON.parse(result as string) as Stats;
+    },
+  });
+  if (isLoading) {
+    return <StatChart read={100} all={150} />;
+  }
+  if (error) {
+    return <div>{error.message}</div>;
+  }
+  if (data) {
+    return <StatChart read={data.readBooks} all={data.totalBooks} />;
+  }
+};
+
+const StatChart = ({ read, all }: { read: number; all: number }) => {
+  const totalBooks = all; // Replace with your actual total books count
+  const readBooks = read; // Replace with your actual read books count
+  const percentageRead = Math.round((readBooks / totalBooks) * 100);
+  const chartData = [
+    { name: "Read Books", value: percentageRead, fill: "var(--color-read)" },
+  ];
+
+  const chartConfig = {
+    value: {
+      label: "Read Books",
+    },
+  } satisfies ChartConfig;
+
+  return (
+    <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-1 items-center justify-center gap-4">
+      <Card className="flex flex-col">
+        <CardContent className="flex-1 pb-0">
+          <ChartContainer
+            config={chartConfig}
+            className="mx-auto aspect-square max-h-[250px]"
+          >
+            <RadialBarChart
+              data={chartData}
+              startAngle={90}
+              endAngle={-(360 * (percentageRead / 100)) + 90}
+              innerRadius={80}
+              outerRadius={110}
+            >
+              <PolarGrid
+                gridType="circle"
+                radialLines={false}
+                stroke="none"
+                className="first:fill-muted last:fill-background"
+                polarRadius={[86, 74]}
+              />
+              <RadialBar dataKey="value" background cornerRadius={10} />
+              <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                        >
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-4xl font-bold"
+                          >
+                            {percentageRead}%
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 24}
+                            className="fill-muted-foreground"
+                          >
+                            Read
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </PolarRadiusAxis>
+            </RadialBarChart>
+          </ChartContainer>
+        </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2 font-medium leading-none">
+            {readBooks} out of {totalBooks} books read
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Keep up the great reading progress!
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};

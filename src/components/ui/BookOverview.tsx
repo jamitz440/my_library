@@ -1,22 +1,26 @@
 "use client";
 import Image from "next/image";
-import type { Book } from "~/app/page";
-import { type ReactNode } from "react";
 
-export const BookOverview = ({ book, children }: { book: Book, children? :ReactNode }) => {
-  console.log(book)
+import { type ReactNode } from "react";
+import { type books } from "~/server/db/schema";
+import { type InferModel } from "drizzle-orm";
+
+type Book = InferModel<typeof books>;
+
+export const BookOverview = ({
+  book,
+  children,
+}: {
+  book: Book;
+  children?: ReactNode;
+}) => {
   return (
     <div
       key={book.title}
-      className="flex flex-col items-center justify-between gap-2 p-2 relative"
+      className="relative flex flex-col items-center justify-between gap-2 p-2"
     >
       <div className="group relative aspect-book h-auto w-full overflow-hidden rounded-sm rounded-e-xl">
-        <Image
-          className="h-auto "
-          src={`${book.image}`}
-          layout="fill"
-          alt={book.title}
-        />
+        <Image className="h-auto" src={`${book.image}`} fill alt={book.title} />
         {children}
       </div>
       <div className="mb-auto w-full">
@@ -27,7 +31,6 @@ export const BookOverview = ({ book, children }: { book: Book, children? :ReactN
           {book.isbn13}
         </div>
       </div>
-      
     </div>
   );
 };

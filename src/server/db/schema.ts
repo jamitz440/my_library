@@ -10,6 +10,7 @@ import {
   varchar,
   integer,
   text,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -33,6 +34,8 @@ export const books = createTable(
     published: varchar("published", { length: 256 }),
     synopsis: text("synopsis"),
     image: varchar("image"),
+    read: boolean("read"),
+    owned: boolean("owned"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),

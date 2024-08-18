@@ -1,26 +1,27 @@
-"use client";
-import { useEffect } from "react";
-import { useBookStore } from "~/state/bookStore";
 import { MenuBar } from "~/components/ui/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
-import { BookOverview } from "~/components/ui/BookOverview";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { getBooks } from "~/server/actions";
+import Books from "./Books";
 
-export default function Library() {
-  const bookStore = useBookStore();
-
-  useEffect(() => {
-    if (bookStore.books.length == 0) {
-      bookStore.getBooks().catch((e) => console.log(e));
-    }
-  }, []);
+export default async function Library() {
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["books"],
+    queryFn: getBooks,
+  });
 
   return (
     <div>
       <NavBar />
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
-      <div className="mb-16 grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {bookStore.books?.map((b) => <BookOverview book={b} key={b?.isbn13} />)}
-      </div>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <Books />
+        </HydrationBoundary>
       </div>
       <MenuBar currentPage="Library" />
     </div>
