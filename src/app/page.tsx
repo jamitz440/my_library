@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
 
 const BarcodeScanner = dynamic(
@@ -9,8 +9,6 @@ const BarcodeScanner = dynamic(
 const DynamicPolyfill = dynamic(
   () =>
     import("react-barcode-scanner/polyfill").then((module) => {
-      // This function will be called when the module is loaded
-      // We don't need to return anything since it's not a component
       return () => null;
     }),
   { ssr: false },
@@ -19,7 +17,7 @@ const DynamicPolyfill = dynamic(
 import { useUser } from "@clerk/nextjs";
 import { Input } from "~/components/ui/input";
 import { getStats } from "~/server/actions";
-import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   Label,
@@ -31,10 +29,7 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "~/components/ui/card";
 import { type ChartConfig, ChartContainer } from "~/components/ui/chart";
 
@@ -48,7 +43,6 @@ import {
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { useToast } from "~/components/ui/use-toast";
-import { useBookStore } from "~/state/bookStore";
 import { MenuBar } from "~/components/ui/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
 import { BookOverview } from "~/components/ui/BookOverview";
@@ -107,17 +101,15 @@ interface BarcodeData {
 
 export default function Home() {
   const [book, setBook] = useState<Book | null>();
-  const [image, setImage] = useState("");
   const [open, setOpen] = useState(false);
   const [dialog, setDialog] = useState(false);
   const { toast } = useToast();
-  const libraryStore = useBookStore();
   const [search, setSearch] = useState<string>("");
   const [authorSearch, setAuthorSearch] = useState<string>("");
   const [results, setResults] = useState<Book[]>();
   const [checked, setChecked] = useState<boolean>(false)
 
-  const { isLoaded, isSignedIn, user } = useUser();
+  const {user } = useUser();
   const queryClient = useQueryClient();
 
   const getBook = async (book: string) => {
@@ -131,7 +123,6 @@ export default function Home() {
       const data = (await res.json()) as Data;
 
       setBook(data.book);
-      setImage(data.book.image);
       setOpen(false);
       setDialog(true);
     } catch (error) {
@@ -180,7 +171,7 @@ export default function Home() {
 
   return (
     <div className="App">
-      <NavBar />
+      <NavBar selected="Home"/>
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-center p-4">
         <StatsSection />
 
@@ -333,7 +324,7 @@ const StatsSection = () => {
     readBooks: number;
   }
 
-  const { data, error, isFetched, isLoading } = useQuery({
+  const { data, error, isLoading } = useQuery({
     queryKey: ["stats"],
     queryFn: async () => {
       const result = await getStats();

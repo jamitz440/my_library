@@ -2,7 +2,6 @@ import {
   FontAwesomeIcon,
   type FontAwesomeIconProps,
 } from "@fortawesome/react-fontawesome";
-import { type IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faBooks,
   faHouse,

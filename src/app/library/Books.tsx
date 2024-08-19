@@ -6,13 +6,12 @@ import {
   FontAwesomeIcon,
   type FontAwesomeIconProps,
 } from "@fortawesome/react-fontawesome";
-import { type IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faBadgeCheck
 } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
 
 export default function Books() {
-  const { data, error, isFetched, isLoading } = useQuery({
+  const { data, error, isLoading } = useQuery({
     queryKey: ["books"],
     queryFn: async () => {
       const result = await getBooks();

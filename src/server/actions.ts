@@ -2,7 +2,7 @@
 
 import { db } from "./db";
 import { books } from "./db/schema";
-import { count, eq, sql } from "drizzle-orm";
+import { count, sql } from "drizzle-orm";
 
 export async function getBooks() {
   try {
