@@ -25,7 +25,7 @@ export const books = createTable(
   "book",
   {
     id: serial("id").primaryKey(),
-    title: varchar("title", { length: 256 }),
+    title: varchar("title", { length: 256 }).notNull(),
     user_id: varchar("user_id", { length: 256 }),
     rating: integer("rating"),
     review: text("review"),

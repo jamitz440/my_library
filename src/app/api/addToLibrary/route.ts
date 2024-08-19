@@ -7,6 +7,7 @@ import { type Book } from "~/app/page";
 interface BookData {
   book: Book;
   user_id: string;
+  read: boolean;
 }
 
 export async function POST(request: NextRequest) {
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
       image: req.book.image,
       published: req.book.date_published,
       synopsis: req.book.synopsis,
+      read: req.read,
     });
     return new NextResponse(
       JSON.stringify({

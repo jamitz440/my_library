@@ -3,15 +3,16 @@ import Image from "next/image";
 
 import { type ReactNode } from "react";
 import { type books } from "~/server/db/schema";
-import { type InferModel } from "drizzle-orm";
+import { type InferSelectModel } from "drizzle-orm"
+import { type Book } from "~/app/page";
 
-type Book = InferModel<typeof books>;
+type Bookk = InferSelectModel<typeof books>
 
 export const BookOverview = ({
   book,
   children,
 }: {
-  book: Book;
+  book: Book | Bookk ;
   children?: ReactNode;
 }) => {
   return (
@@ -27,9 +28,9 @@ export const BookOverview = ({
         <div className="mb-auto w-auto text-sm font-bold sm:text-base md:text-lg">
           {book.title}
         </div>
-        <div className="mb-auto w-auto text-xs text-zinc-400 sm:text-sm md:text-base lg:text-lg">
+        {/* <div className="mb-auto w-auto text-xs text-zinc-400 sm:text-sm md:text-base lg:text-lg">
           {book.isbn13}
-        </div>
+        </div> */}
       </div>
     </div>
   );

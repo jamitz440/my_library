@@ -10,10 +10,15 @@ import Books from "./Books";
 
 export default async function Library() {
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: ["books"],
-    queryFn: getBooks,
-  });
+  try {
+    await queryClient.prefetchQuery({ 
+      queryKey: ["books"], 
+      queryFn: getBooks, 
+      staleTime: 1000 
+    });
+  } catch (error) {
+    console.error("Error during prefetch:", error); 
+  }
 
   return (
     <div>

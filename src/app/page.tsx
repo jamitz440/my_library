@@ -36,7 +36,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { ChartConfig, ChartContainer } from "~/components/ui/chart";
+import { type ChartConfig, ChartContainer } from "~/components/ui/chart";
 
 import Image from "next/image";
 import {
@@ -52,6 +52,7 @@ import { useBookStore } from "~/state/bookStore";
 import { MenuBar } from "~/components/ui/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
 import { BookOverview } from "~/components/ui/BookOverview";
+import { Checkbox } from "~/components/ui/checkbox";
 
 interface DimensionsStructured {
   length: {
@@ -114,6 +115,7 @@ export default function Home() {
   const [search, setSearch] = useState<string>("");
   const [authorSearch, setAuthorSearch] = useState<string>("");
   const [results, setResults] = useState<Book[]>();
+  const [checked, setChecked] = useState<boolean>(false)
 
   const { isLoaded, isSignedIn, user } = useUser();
   const queryClient = useQueryClient();
@@ -141,7 +143,7 @@ export default function Home() {
   const handleAdd = async () => {
     const res = await fetch("api/addToLibrary", {
       method: "POST",
-      body: JSON.stringify({ book: book, user_id: user?.id }),
+      body: JSON.stringify({ book: book, user_id: user?.id, read: checked }),
     });
     toast({
       title: `Added to Library`,
@@ -237,6 +239,15 @@ export default function Home() {
                   Published: {book?.date_published}
                 </div>
                 <div className="textlg">Pages: {book?.pages}</div>
+                <div className="flex items-center space-x-2 mt-4">
+                  <Checkbox id="terms" checked={checked} onClick={() => setChecked(!checked)} />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Mark as read
+                  </label>
+                </div>
               </div>
             </div>
             <div className="flex w-full justify-around gap-4">
@@ -397,7 +408,7 @@ const StatChart = ({ read, all }: { read: number; all: number }) => {
                           </tspan>
                           <tspan
                             x={viewBox.cx}
-                            y={(viewBox.cy || 0) + 24}
+                            y={(viewBox.cy ?? 0) + 24}
                             className="fill-muted-foreground"
                           >
                             Read

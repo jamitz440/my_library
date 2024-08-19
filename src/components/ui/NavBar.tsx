@@ -5,9 +5,8 @@ import {
 } from "@fortawesome/react-fontawesome";
 import { faBooks } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
 import Link from "next/link";
-import { useUser } from "@clerk/nextjs";
-import { SignInButton } from "@clerk/nextjs";
 import React from "react";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
 export const NavBar = () => {
   const MemoizedProfileButton = React.memo(ProfileButton);
@@ -55,7 +54,7 @@ export const NavBar = () => {
               </Link>
             </li>
             <li>
-              <MemoizedProfileButton />
+                <MemoizedProfileButton />
             </li>
           </ul>
         </div>
@@ -65,19 +64,14 @@ export const NavBar = () => {
 };
 
 const ProfileButton = () => {
-  const { isSignedIn } = useUser();
-  return isSignedIn ? (
-    <Link
-      href="/profile"
-      className="block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-blue-700 sm:dark:hover:bg-transparent sm:dark:hover:text-blue-500"
-    >
-      Profile
-    </Link>
-  ) : (
-    <SignInButton>
-      <div className="block cursor-pointer select-none rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-blue-700 sm:dark:hover:bg-transparent sm:dark:hover:text-blue-500">
-        Sign In
-      </div>
-    </SignInButton>
+  return (
+    <div>
+      <SignedIn>
+        <Link href="/profile">Profile</Link>
+      </SignedIn>
+      <SignedOut>
+        <SignInButton>Sign In</SignInButton>
+      </SignedOut>
+    </div>
   );
 };
