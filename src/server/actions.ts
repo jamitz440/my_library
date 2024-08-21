@@ -7,14 +7,9 @@ import { count, sql } from "drizzle-orm";
 export async function getBooks() {
   try {
     const rawData = await db.select().from(books);
-    
+    console.log(rawData);
 
-    // Convert raw data into plain objects (if necessary)
-    const data = rawData.map((row) => ({
-      ...row,
-    }));
-    // Add this line for debugging
-    return {data};
+    return rawData;
   } catch (error) {
     return { error: error };
   }

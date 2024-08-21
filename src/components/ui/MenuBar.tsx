@@ -43,7 +43,7 @@ export const MenuBar = ({
   currentPage: "Home" | "TBR" | "Library" | "Profile";
 }) => {
   return (
-    <div className="fixed bottom-0 left-0 z-50 h-16 w-full border-t border-border bg-backgroundsm:hidden">
+    <div className="fixed bottom-0 left-0 z-50 h-16 w-full border-t border-border bg-background sm:hidden">
       <div className="mx-auto grid h-full max-w-lg grid-cols-5 font-medium">
         {pages.map((page) =>
           page.name == "Add" ? (
@@ -62,7 +62,7 @@ export const MenuBar = ({
               key={`${page.name}-menu-button`}
               href={page.link}
               type="button"
-              className="group inline-flex flex-col items-center justify-center px-5 hover:bg-muted "
+              className="group inline-flex flex-col items-center justify-center px-5 hover:bg-muted"
             >
               <FontAwesomeIcon
                 className={`mb-2 h-5 w-5 text-gray-500 dark:text-gray-400 ${page.name == currentPage && "text-primary"} `}

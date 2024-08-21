@@ -1,6 +1,4 @@
 import "~/styles/globals.css";
-
-import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { Toaster } from "~/components/ui/toaster";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -18,14 +16,14 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <html lang="en" suppressHydrationWarning >
+      <html lang="en" suppressHydrationWarning>
         <ReactQueryProvider>
           <body>
             <ThemeProvider
               attribute="class"
               defaultTheme="pink"
               enableSystem={false}
-              themes={["blue", "purple", "red", "lightPink", "darkPink", "darkT", "lightT"]}
+              themes={["red", "darkRed", "rose", "darkRose", "light", "dark"]}
               disableTransitionOnChange={false}
             >
               <Toaster />

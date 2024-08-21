@@ -26,11 +26,7 @@ import {
   RadialBar,
   RadialBarChart,
 } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-} from "~/components/ui/card";
+import { Card, CardContent, CardFooter } from "~/components/ui/card";
 import { type ChartConfig, ChartContainer } from "~/components/ui/chart";
 
 import Image from "next/image";
@@ -108,11 +104,11 @@ export default function Home() {
   const [search, setSearch] = useState<string>("");
   const [authorSearch, setAuthorSearch] = useState<string>("");
   const [results, setResults] = useState<Book[]>();
-  const [checked, setChecked] = useState<boolean>(false)
+  const [checked, setChecked] = useState<boolean>(false);
 
-  const {setTheme} = useTheme()
+  const { setTheme } = useTheme();
 
-  const {user } = useUser();
+  const { user } = useUser();
   const queryClient = useQueryClient();
 
   const getBook = async (book: string) => {
@@ -174,21 +170,21 @@ export default function Home() {
 
   const [themeTrigger, setThemeTrigger] = useState(false);
 
-  const handleThemeChange = (theme:string) => {
+  const handleThemeChange = (theme: string) => {
     setTheme(theme);
     setThemeTrigger(!themeTrigger); // Toggle the trigger
   };
 
   return (
-    <div className="App bg-background min-h-screen">
-      <NavBar selected="Home"/>
+    <div className="App min-h-screen bg-background">
+      <NavBar selected="Home" />
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-center p-4">
         <StatsSection />
 
         <div className="flex w-full items-center justify-center gap-4">
           <div className="flex flex-col gap-4 lg:w-1/2">
             <Input
-              className="w-full"
+              className="w-full text-secondary-foreground"
               value={search}
               placeholder="Title"
               onChange={(e) => {
@@ -196,7 +192,7 @@ export default function Home() {
               }}
             />
             <Input
-              className="w-full"
+              className="w-full text-secondary-foreground"
               placeholder="Author"
               value={authorSearch}
               onChange={(e) => {
@@ -221,13 +217,13 @@ export default function Home() {
           >
             <DialogClose onClick={() => setDialog(false)} />
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="text-secondary-foreground">
                 {search
                   ? "Add this book to your library?"
                   : "Is this the correct book?"}
               </DialogTitle>
             </DialogHeader>
-            <div className="flex w-full gap-4">
+            <div className="flex w-full gap-4 text-accent-foreground">
               <div className="relative aspect-book h-52 w-auto overflow-hidden rounded-md">
                 {book && (
                   <Image layout="fill" src={book.image} alt={book.title} />
@@ -240,8 +236,12 @@ export default function Home() {
                   Published: {book?.date_published}
                 </div>
                 <div className="textlg">Pages: {book?.pages}</div>
-                <div className="flex items-center space-x-2 mt-4">
-                  <Checkbox id="terms" checked={checked} onClick={() => setChecked(!checked)} />
+                <div className="mt-4 flex items-center space-x-2">
+                  <Checkbox
+                    id="terms"
+                    checked={checked}
+                    onClick={() => setChecked(!checked)}
+                  />
                   <label
                     htmlFor="terms"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -323,15 +323,7 @@ export default function Home() {
           )}
         </div>
       </div>
-      <div>
-        <Button onClick={()=>{handleThemeChange("blue")}}>blue</Button>
-        <Button onClick={()=>{handleThemeChange("lightPink")}}>pink</Button>
-        <Button onClick={()=>{handleThemeChange("darkPink")}}>pink</Button>
-        <Button onClick={()=>{handleThemeChange("purple")}}>purple</Button>
-        <Button onClick={()=>{handleThemeChange("red")}}>red</Button>
-        <Button onClick={()=>{handleThemeChange("darkT")}}>turquoise</Button>
-        <Button onClick={()=>{handleThemeChange("lightT")}}>turquoise</Button>
-      </div>
+      <div></div>
       <MenuBar currentPage="Home" />
     </div>
   );
@@ -365,9 +357,7 @@ const StatChart = ({ read, all }: { read: number; all: number }) => {
   const totalBooks = all; // Replace with your actual total books count
   const readBooks = read; // Replace with your actual read books count
   const percentageRead = Math.round((readBooks / totalBooks) * 100);
-  const chartData = [
-    { name: "Read Books", value: percentageRead },
-  ];
+  const chartData = [{ name: "Read Books", value: percentageRead }];
 
   const chartConfig = {
     value: {
@@ -391,7 +381,6 @@ const StatChart = ({ read, all }: { read: number; all: number }) => {
               innerRadius={80}
               outerRadius={110}
               className="fill-primary"
-              
             >
               <PolarGrid
                 gridType="circle"

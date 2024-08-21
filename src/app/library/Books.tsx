@@ -6,16 +6,14 @@ import {
   FontAwesomeIcon,
   type FontAwesomeIconProps,
 } from "@fortawesome/react-fontawesome";
-import {
-  faBadgeCheck
-} from "@awesome.me/kit-30477fcccd/icons/classic/solid";
+import { faBadgeCheck } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
 
 export default function Books() {
   const { data, error, isLoading } = useQuery({
     queryKey: ["books"],
     queryFn: async () => {
       const result = await getBooks();
-      return result
+      return result;
     },
     staleTime: 1000,
   });
@@ -23,13 +21,26 @@ export default function Books() {
     return <div>Loading...</div>;
   }
   if (error) {
+    console.log(data);
     return <div>{error.message}</div>;
   }
   if (data) {
-    
     return (
       <div className="mb-16 grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {data.data?.map((b) => <BookOverview book={b} key={b.id}>{b.read ? <div className="absolute bottom-0 h-24 w-auto p-1 pt-14 pr-14 aspect-square bg-gradient-to-tr from-white from-40% to-transparent to-50% group-hover:opacity-0 transition-opacity duration-150"><FontAwesomeIcon className="h-full w-full text-green-600" icon={faBadgeCheck as FontAwesomeIconProps["icon"]} /></div> : ''}</BookOverview>)}
+        {data.map((b) => (
+          <BookOverview book={b} key={b.id}>
+            {b.read ? (
+              <div className="absolute bottom-0 aspect-square h-24 w-24 bg-gradient-to-tr from-background from-25% to-transparent to-25% p-1 pr-[72px] pt-[72px]">
+                <FontAwesomeIcon
+                  className="h-full w-full text-primary"
+                  icon={faBadgeCheck as FontAwesomeIconProps["icon"]}
+                />
+              </div>
+            ) : (
+              ""
+            )}
+          </BookOverview>
+        ))}
       </div>
     );
   }
