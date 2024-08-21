@@ -18,8 +18,8 @@ export const NavBar = ({selected} : {selected:string}) => {
   const pages: Page[] = [
     { name: "Home", link: "/" },
     {
-      name: "TBR",
-      link: "/tbr",
+      name: "Wishlist",
+      link: "/wishlist",
     },
     {
       name: "Library",
@@ -33,7 +33,7 @@ export const NavBar = ({selected} : {selected:string}) => {
   
   const MemoizedProfileButton = React.memo(ProfileButton);
   return (
-    <nav className="border-gray-200 bg-white dark:bg-gray-900">
+    <nav className="border-gray-200 border-border border-b">
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <Link
           href="/"
@@ -41,7 +41,7 @@ export const NavBar = ({selected} : {selected:string}) => {
         >
           <FontAwesomeIcon
             icon={faBooks as FontAwesomeIconProps["icon"]}
-            className="h-8"
+            className="h-8 text-primary"
           />
           <span className="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
             My Library
@@ -49,15 +49,15 @@ export const NavBar = ({selected} : {selected:string}) => {
         </Link>
 
         <div className="hidden w-full sm:block sm:w-auto" id="navbar-default">
-          <ul className="mt-4 flex flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 font-medium dark:border-gray-700 dark:bg-gray-800 sm:mt-0 sm:flex-row sm:space-x-8 sm:border-0 sm:bg-white sm:p-0 sm:dark:bg-gray-900 rtl:space-x-reverse">
+          <ul className="mt-4 flex flex-col rounded-lg border border-gray-100 p-4 font-medium dark:border-gray-700 dark:bg-gray-800 sm:mt-0 sm:flex-row sm:space-x-8 sm:border-0  sm:p-0  rtl:space-x-reverse">
             {pages.map((page) => page.name === 'Profile' ? 
             <li key={page.name}>
-                <MemoizedProfileButton />
+                <MemoizedProfileButton selected={selected == "Profile"}/>
             </li> :
             <li key={page.name}>
               <Link
                 href={page.link}
-                className={`${page.name == selected ?  "block rounded bg-blue-700 px-3 py-2 text-white dark:text-white sm:bg-transparent sm:p-0 sm:text-blue-700 sm:dark:text-blue-500" : "block rounded px-3 py-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-blue-700 sm:dark:hover:bg-transparent sm:dark:hover:text-blue-500"}`}
+                className={`${page.name == selected ?  "block rounded bg-blue-700 px-3 py-2 text-white dark:text-white sm:bg-transparent sm:p-0 sm:text-primary sm:dark:text-primary" : "block rounded px-3 py-2 text-muted-foreground hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-primary sm:dark:hover:bg-transparent sm:dark:hover:text-primary"}`}
                 aria-current="page"
               >
                 {page.name}
@@ -70,9 +70,9 @@ export const NavBar = ({selected} : {selected:string}) => {
   );
 };
 
-const ProfileButton = () => {
+const ProfileButton = ({selected}: {selected:boolean}) => {
   return (
-    <div>
+    <div className={`${selected ?  "block rounded bg-blue-700 px-3 py-2 text-white dark:text-white sm:bg-transparent sm:p-0 sm:text-primary sm:dark:text-primary" : "block rounded px-3 py-2 text-muted-foreground hover:bg-gray-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white sm:border-0 sm:p-0 sm:hover:bg-transparent sm:hover:text-primary sm:dark:hover:bg-transparent sm:dark:hover:text-primary"}`}>
       <SignedIn>
         <Link href="/profile">Profile</Link>
       </SignedIn>

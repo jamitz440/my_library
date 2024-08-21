@@ -5,6 +5,7 @@ import { type Metadata } from "next";
 import { Toaster } from "~/components/ui/toaster";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ReactQueryProvider } from "./ReactQueryProvider";
+import { ThemeProvider } from "~/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "MyLibrary",
@@ -16,15 +17,23 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ReactQueryProvider>
-      <ClerkProvider>
-        <html lang="en" className={`${GeistSans.variable}`}>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning >
+        <ReactQueryProvider>
           <body>
-            <Toaster />
-            {children}
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="pink"
+              enableSystem={false}
+              themes={["blue", "purple", "red", "lightPink", "darkPink", "darkT", "lightT"]}
+              disableTransitionOnChange={false}
+            >
+              <Toaster />
+              {children}
+            </ThemeProvider>
           </body>
-        </html>
-      </ClerkProvider>
-    </ReactQueryProvider>
+        </ReactQueryProvider>
+      </html>
+    </ClerkProvider>
   );
 }

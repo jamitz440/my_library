@@ -47,6 +47,7 @@ import { MenuBar } from "~/components/ui/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
 import { BookOverview } from "~/components/ui/BookOverview";
 import { Checkbox } from "~/components/ui/checkbox";
+import { useTheme } from "next-themes";
 
 interface DimensionsStructured {
   length: {
@@ -109,6 +110,8 @@ export default function Home() {
   const [results, setResults] = useState<Book[]>();
   const [checked, setChecked] = useState<boolean>(false)
 
+  const {setTheme} = useTheme()
+
   const {user } = useUser();
   const queryClient = useQueryClient();
 
@@ -169,8 +172,15 @@ export default function Home() {
     setResults(data.data);
   };
 
+  const [themeTrigger, setThemeTrigger] = useState(false);
+
+  const handleThemeChange = (theme:string) => {
+    setTheme(theme);
+    setThemeTrigger(!themeTrigger); // Toggle the trigger
+  };
+
   return (
-    <div className="App">
+    <div className="App bg-background min-h-screen">
       <NavBar selected="Home"/>
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-center p-4">
         <StatsSection />
@@ -313,6 +323,15 @@ export default function Home() {
           )}
         </div>
       </div>
+      <div>
+        <Button onClick={()=>{handleThemeChange("blue")}}>blue</Button>
+        <Button onClick={()=>{handleThemeChange("lightPink")}}>pink</Button>
+        <Button onClick={()=>{handleThemeChange("darkPink")}}>pink</Button>
+        <Button onClick={()=>{handleThemeChange("purple")}}>purple</Button>
+        <Button onClick={()=>{handleThemeChange("red")}}>red</Button>
+        <Button onClick={()=>{handleThemeChange("darkT")}}>turquoise</Button>
+        <Button onClick={()=>{handleThemeChange("lightT")}}>turquoise</Button>
+      </div>
       <MenuBar currentPage="Home" />
     </div>
   );
@@ -347,12 +366,13 @@ const StatChart = ({ read, all }: { read: number; all: number }) => {
   const readBooks = read; // Replace with your actual read books count
   const percentageRead = Math.round((readBooks / totalBooks) * 100);
   const chartData = [
-    { name: "Read Books", value: percentageRead, fill: "var(--color-read)" },
+    { name: "Read Books", value: percentageRead },
   ];
 
   const chartConfig = {
     value: {
       label: "Read Books",
+      color: "hsl(var(--chart-1))",
     },
   } satisfies ChartConfig;
 
@@ -370,6 +390,8 @@ const StatChart = ({ read, all }: { read: number; all: number }) => {
               endAngle={-(360 * (percentageRead / 100)) + 90}
               innerRadius={80}
               outerRadius={110}
+              className="fill-primary"
+              
             >
               <PolarGrid
                 gridType="circle"
