@@ -8,11 +8,11 @@ interface BookData {
   book: Book;
   user_id: string;
   read: boolean;
+  owned: boolean;
 }
 
 export async function POST(request: NextRequest) {
   const req = (await request.json()) as BookData;
-  console.log(req.book.title);
 
   try {
     await db.insert(books).values({
@@ -23,7 +23,9 @@ export async function POST(request: NextRequest) {
       image: req.book.image,
       published: req.book.date_published,
       synopsis: req.book.synopsis,
+      subjects: req.book.subjects,
       read: req.read,
+      owned: req.owned,
     });
     return new NextResponse(
       JSON.stringify({

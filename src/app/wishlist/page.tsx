@@ -5,15 +5,15 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { getLibrary } from "~/server/actions";
-import Books from "./Books";
+import { getWishlist } from "~/server/actions";
+import Books from "../library/Books";
 
-export default async function Library() {
+export default async function Wishlist() {
   const queryClient = new QueryClient();
   try {
     await queryClient.prefetchQuery({
-      queryKey: ["library"],
-      queryFn: getLibrary,
+      queryKey: ["wishlist"],
+      queryFn: getWishlist,
       staleTime: 1000,
     });
   } catch (error) {
@@ -22,13 +22,13 @@ export default async function Library() {
 
   return (
     <div className="min-h-screen bg-background">
-      <NavBar selected="Library" />
+      <NavBar selected="Wishlist" />
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <HydrationBoundary state={dehydrate(queryClient)}>
-          <Books page="library" />
+          <Books page="wishlist" />
         </HydrationBoundary>
       </div>
-      <MenuBar currentPage="Library" />
+      <MenuBar currentPage="Add" />
     </div>
   );
 }

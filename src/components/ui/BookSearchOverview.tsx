@@ -1,12 +1,9 @@
 import Image from "next/image";
 import { type ReactNode } from "react";
 import { Card } from "./card";
-import { type books } from "~/server/db/schema";
-import { type InferSelectModel } from "drizzle-orm";
+import { type Book } from "~/app/page";
 
-type Book = InferSelectModel<typeof books>;
-
-export const BookOverview = ({
+export const BookSearchOverview = ({
   book,
   children,
 }: {
@@ -19,10 +16,10 @@ export const BookOverview = ({
       className="relative flex flex-col items-center justify-between gap-2 p-2"
     >
       <div
-        className={`${book.read ? "bg-black" : ""} group relative aspect-book h-auto w-full overflow-hidden rounded-sm rounded-e-xl`}
+        className={`group relative aspect-book h-auto w-full overflow-hidden rounded-sm rounded-e-xl`}
       >
         <Image
-          className={`${book.read ? "opacity-70" : ""} h-auto`}
+          className={`h-auto`}
           src={`${book.image}`}
           fill
           alt={book.title}

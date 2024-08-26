@@ -24,7 +24,11 @@ const pages: Page[] = [
     icon: faBookmark as FontAwesomeIconProps["icon"],
     link: "/wishlist",
   },
-  { name: "Add", icon: faPlus as FontAwesomeIconProps["icon"], link: "/" },
+  {
+    name: "Search",
+    icon: faPlus as FontAwesomeIconProps["icon"],
+    link: "/search",
+  },
   {
     name: "Library",
     icon: faBooks as FontAwesomeIconProps["icon"],
@@ -40,23 +44,14 @@ const pages: Page[] = [
 export const MenuBar = ({
   currentPage,
 }: {
-  currentPage: "Home" | "TBR" | "Library" | "Profile";
+  currentPage: "Home" | "Wishlist" | "Library" | "Profile" | "Add";
 }) => {
   return (
     <div className="fixed bottom-0 left-0 z-50 h-16 w-full border-t border-border bg-background sm:hidden">
       <div className="mx-auto grid h-full max-w-lg grid-cols-5 font-medium">
         {pages.map((page) =>
-          page.name == "Add" ? (
-            <Link
-              key={`${page.name}-menu-button`}
-              href={page.link}
-              className="mx-auto my-auto flex h-16 w-16 -translate-y-4 items-center justify-center rounded-full bg-primary"
-            >
-              <FontAwesomeIcon
-                className={`mb-2 flex h-10 w-10 translate-y-1 items-center justify-center text-white dark:text-gray-400`}
-                icon={page.icon}
-              />
-            </Link>
+          page.name == "Search" ? (
+            <AddButton key={page.name} icon={page.icon} />
           ) : (
             <Link
               key={`${page.name}-menu-button`}
@@ -65,7 +60,7 @@ export const MenuBar = ({
               className="group inline-flex flex-col items-center justify-center px-5 hover:bg-muted"
             >
               <FontAwesomeIcon
-                className={`mb-2 h-5 w-5 text-gray-500 dark:text-gray-400 ${page.name == currentPage && "text-primary"} `}
+                className={`mb-2 h-5 w-5 text-gray-500 dark:text-gray-400 ${page.name == currentPage && "text-primary"}`}
                 icon={page.icon}
               />
               <span
@@ -78,5 +73,19 @@ export const MenuBar = ({
         )}
       </div>
     </div>
+  );
+};
+
+const AddButton = ({ icon }: { icon: FontAwesomeIconProps["icon"] }) => {
+  return (
+    <Link
+      href={"/search"}
+      className="mx-auto my-auto flex h-16 w-16 -translate-y-4 items-center justify-center rounded-full bg-primary"
+    >
+      <FontAwesomeIcon
+        className={`mb-2 flex h-10 w-10 translate-y-1 items-center justify-center text-white dark:text-gray-400`}
+        icon={icon}
+      />
+    </Link>
   );
 };

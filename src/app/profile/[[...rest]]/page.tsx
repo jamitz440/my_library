@@ -6,9 +6,28 @@ import { useTheme } from "next-themes";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { SignOutButton, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
 
 export default function Profile() {
-  const themes = ["red", "darkRed", "rose", "darkRose", "light", "dark"];
+  const themes = [
+    "red",
+    "darkRed",
+    "rose",
+    "darkRose",
+    "yellow",
+    "darkYellow",
+    "green",
+    "darkGreen",
+    "blue",
+    "darkBlue",
+    "purple",
+    "darkPurple",
+    "orange",
+    "darkOrange",
+    "light",
+    "dark",
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -22,6 +41,18 @@ export default function Profile() {
               <ThemeCircle key={t} theme={t} />
             ))}
           </CardContent>
+        </Card>
+        <Card>
+          <SignedIn>
+            <Button>
+              <SignOutButton />
+            </Button>
+          </SignedIn>
+          <SignedOut>
+            <Button>
+              <SignInButton />
+            </Button>
+          </SignedOut>
         </Card>
       </div>
       <MenuBar currentPage="Profile" />

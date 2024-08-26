@@ -6,7 +6,7 @@ import {
 import { faBooks } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
 import Link from "next/link";
 import React from "react";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/nextjs";
 
 export const NavBar = ({ selected }: { selected: string }) => {
   type Page = {
@@ -16,6 +16,10 @@ export const NavBar = ({ selected }: { selected: string }) => {
 
   const pages: Page[] = [
     { name: "Home", link: "/" },
+    {
+      name: "Add Books",
+      link: "/search",
+    },
     {
       name: "Wishlist",
       link: "/wishlist",
@@ -31,6 +35,7 @@ export const NavBar = ({ selected }: { selected: string }) => {
   ];
 
   const MemoizedProfileButton = React.memo(ProfileButton);
+  const { user } = useUser();
   return (
     <nav className="border-b border-border">
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
@@ -43,7 +48,11 @@ export const NavBar = ({ selected }: { selected: string }) => {
             className="h-8 text-primary"
           />
           <span className="self-center whitespace-nowrap text-2xl font-semibold text-secondary-foreground">
-            My Library
+            <SignedOut>My Library</SignedOut>
+            <SignedIn>
+              {user?.firstName}
+              {`'s Library`}
+            </SignedIn>
           </span>
         </Link>
 

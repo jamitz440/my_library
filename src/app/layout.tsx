@@ -23,7 +23,24 @@ export default function RootLayout({
               attribute="class"
               defaultTheme="pink"
               enableSystem={false}
-              themes={["red", "darkRed", "rose", "darkRose", "light", "dark"]}
+              themes={[
+                "red",
+                "darkRed",
+                "rose",
+                "darkRose",
+                "yellow",
+                "darkYellow",
+                "green",
+                "darkGreen",
+                "blue",
+                "darkBlue",
+                "purple",
+                "darkPurple",
+                "orange",
+                "darkOrange",
+                "light",
+                "dark",
+              ]}
               disableTransitionOnChange={false}
             >
               <Toaster />

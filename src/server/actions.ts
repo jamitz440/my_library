@@ -2,11 +2,30 @@
 
 import { db } from "./db";
 import { books } from "./db/schema";
-import { count, sql } from "drizzle-orm";
+import { count, sql, eq, ne, and } from "drizzle-orm";
+import { auth } from "@clerk/nextjs/server";
 
-export async function getBooks() {
+export async function getLibrary() {
+  const { userId } = auth();
   try {
-    const rawData = await db.select().from(books);
+    const rawData = await db
+      .select()
+      .from(books)
+      .where(and(eq(books.owned, true), eq(books.user_id, userId!)));
+    console.log(rawData);
+
+    return rawData;
+  } catch (error) {
+    return { error: error };
+  }
+}
+export async function getWishlist() {
+  const { userId } = auth();
+  try {
+    const rawData = await db
+      .select()
+      .from(books)
+      .where(and(ne(books.owned, true), eq(books.user_id, userId!)));
     console.log(rawData);
 
     return rawData;
@@ -20,6 +39,7 @@ export async function getBooks() {
 // }
 
 export async function getStats() {
+  const { userId } = auth();
   try {
     const [sampleData] = await db
       .select({
@@ -29,7 +49,8 @@ export async function getStats() {
             Number,
           ),
       })
-      .from(books);
+      .from(books)
+      .where(and(eq(books.user_id, userId!), eq(books.owned, true)));
 
     return JSON.stringify(sampleData); // Return as a plain object, not a string
   } catch (error) {
@@ -47,6 +68,7 @@ export async function addBook({
   image,
   read,
   owned,
+  subjects,
 }: {
   title: string;
   user_id: string;
@@ -57,6 +79,7 @@ export async function addBook({
   image: string;
   read: boolean;
   owned: boolean;
+  subjects: string[];
 }) {
   try {
     const newBook = await db.insert(books).values({
@@ -69,6 +92,7 @@ export async function addBook({
       image,
       read,
       owned,
+      subjects,
       createdAt: new Date(),
       updatedAt: new Date(),
     });

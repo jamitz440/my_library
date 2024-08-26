@@ -37,6 +37,7 @@ export const books = createTable(
     read: boolean("read"),
     owned: boolean("owned"),
     theme: varchar("theme", { length: 256 }),
+    subjects: varchar("subjects").array(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),

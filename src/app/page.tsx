@@ -1,21 +1,23 @@
 "use client";
 import React, { useState } from "react";
-import dynamic from "next/dynamic";
-
-const BarcodeScanner = dynamic(
-  () => import("react-barcode-scanner").then((mod) => mod.BarcodeScanner),
-  { ssr: false },
-);
-const DynamicPolyfill = dynamic(
-  () =>
-    import("react-barcode-scanner/polyfill").then((module) => {
-      return () => null;
-    }),
-  { ssr: false },
-);
-
-import { useUser } from "@clerk/nextjs";
-import { Input } from "~/components/ui/input";
+import { TrendingUp } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  PolarAngleAxis,
+  Radar,
+  RadarChart,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "~/components/ui/chart";
 import { getStats } from "~/server/actions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -26,24 +28,17 @@ import {
   RadialBar,
   RadialBarChart,
 } from "recharts";
-import { Card, CardContent, CardFooter } from "~/components/ui/card";
-import { type ChartConfig, ChartContainer } from "~/components/ui/chart";
-
-import Image from "next/image";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "~/components/ui/dialog";
-import { Button } from "~/components/ui/button";
-import { useToast } from "~/components/ui/use-toast";
 import { MenuBar } from "~/components/ui/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
-import { BookOverview } from "~/components/ui/BookOverview";
-import { Checkbox } from "~/components/ui/checkbox";
-import { useTheme } from "next-themes";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 
 interface DimensionsStructured {
   length: {
@@ -84,246 +79,13 @@ export interface Book {
   isbn10: string;
 }
 
-interface Data {
-  book: Book;
-}
-
-interface Res {
-  data: Book[];
-}
-
-interface BarcodeData {
-  rawValue: string;
-}
-
 export default function Home() {
-  const [book, setBook] = useState<Book | null>();
-  const [open, setOpen] = useState(false);
-  const [dialog, setDialog] = useState(false);
-  const { toast } = useToast();
-  const [search, setSearch] = useState<string>("");
-  const [authorSearch, setAuthorSearch] = useState<string>("");
-  const [results, setResults] = useState<Book[]>();
-  const [checked, setChecked] = useState<boolean>(false);
-
-  const { setTheme } = useTheme();
-
-  const { user } = useUser();
-  const queryClient = useQueryClient();
-
-  const getBook = async (book: string) => {
-    try {
-      const res = await fetch("api/getBook", { method: "POST", body: book });
-
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = (await res.json()) as Data;
-
-      setBook(data.book);
-      setOpen(false);
-      setDialog(true);
-    } catch (error) {
-      console.error("Failed to fetch book data:", error);
-      setBook(null);
-    }
-  };
-
-  const handleAdd = async () => {
-    const res = await fetch("api/addToLibrary", {
-      method: "POST",
-      body: JSON.stringify({ book: book, user_id: user?.id, read: checked }),
-    });
-    toast({
-      title: `Added to Library`,
-      description: `${book?.title} - ${book?.authors[0]}`,
-    });
-    await queryClient.invalidateQueries({ queryKey: ["books"] });
-    await queryClient.invalidateQueries({ queryKey: ["stats"] });
-    setDialog(false);
-  };
-
-  const handleReset = () => {
-    setBook(null);
-    setDialog(false);
-    setOpen(true);
-  };
-
-  const handleSearch = async () => {
-    if (search === "") {
-      return;
-    }
-    const res = await fetch("api/searchBooks", {
-      method: "POST",
-      body: JSON.stringify({ title: search, author: authorSearch }),
-    });
-
-    if (!res.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    const data = (await res.json()) as Res;
-
-    setResults(data.data);
-  };
-
-  const [themeTrigger, setThemeTrigger] = useState(false);
-
-  const handleThemeChange = (theme: string) => {
-    setTheme(theme);
-    setThemeTrigger(!themeTrigger); // Toggle the trigger
-  };
-
   return (
     <div className="App min-h-screen bg-background">
       <NavBar selected="Home" />
-      <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-center p-4">
-        <StatsSection />
 
-        <div className="flex w-full items-center justify-center gap-4">
-          <div className="flex flex-col gap-4 lg:w-1/2">
-            <Input
-              className="w-full text-secondary-foreground"
-              value={search}
-              placeholder="Title"
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
-            />
-            <Input
-              className="w-full text-secondary-foreground"
-              placeholder="Author"
-              value={authorSearch}
-              onChange={(e) => {
-                setAuthorSearch(e.target.value);
-              }}
-            />
-          </div>
-          <div className="flex flex-col gap-4">
-            <Button onClick={handleSearch}>Search</Button>
-            <Button variant={"secondary"} onClick={() => setOpen(true)}>
-              Scan
-            </Button>
-          </div>
-        </div>
+      <StatsSection />
 
-        <Dialog open={dialog}>
-          <DialogContent
-            onPointerDownOutside={() => {
-              setDialog(false);
-              setOpen(true);
-            }}
-          >
-            <DialogClose onClick={() => setDialog(false)} />
-            <DialogHeader>
-              <DialogTitle className="text-secondary-foreground">
-                {search
-                  ? "Add this book to your library?"
-                  : "Is this the correct book?"}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="flex w-full gap-4 text-accent-foreground">
-              <div className="relative aspect-book h-52 w-auto overflow-hidden rounded-md">
-                {book && (
-                  <Image layout="fill" src={book.image} alt={book.title} />
-                )}
-              </div>
-              <div className="flex flex-col">
-                <div className="text-lg font-bold">{book?.title}</div>
-                <div className="text-lg">{book?.authors}</div>
-                <div className="text mt-4">
-                  Published: {book?.date_published}
-                </div>
-                <div className="textlg">Pages: {book?.pages}</div>
-                <div className="mt-4 flex items-center space-x-2">
-                  <Checkbox
-                    id="terms"
-                    checked={checked}
-                    onClick={() => setChecked(!checked)}
-                  />
-                  <label
-                    htmlFor="terms"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Mark as read
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div className="flex w-full justify-around gap-4">
-              <Button
-                variant={"secondary"}
-                onClick={handleReset}
-                className="w-full"
-              >
-                {`No, that's not right!`}
-              </Button>
-              <Button className="w-full" onClick={handleAdd}>
-                {`Add to MyLibrary! `}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {open && (
-          <>
-            <DynamicPolyfill />
-            <BarcodeScanner
-              onCapture={(i: BarcodeData) => getBook(i.rawValue)}
-              options={{ formats: ["ean_13"] }}
-            />
-          </>
-        )}
-
-        <div className="flex flex-grow flex-wrap">
-          {results ? (
-            <div className="mb-16 grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-              {results
-                .reduce((uniqueBooks: Book[], b: Book) => {
-                  const existingBook = uniqueBooks.find(
-                    (ub: Book) =>
-                      ub.title === b.title &&
-                      Array.isArray(b.authors) &&
-                      Array.isArray(ub.authors) &&
-                      b.authors.join("") === ub.authors.join(""),
-                  );
-                  if (!existingBook) {
-                    uniqueBooks.push(b);
-                  } else {
-                    if (BigInt(b.isbn13) > BigInt(existingBook.isbn13)) {
-                      uniqueBooks.splice(
-                        uniqueBooks.indexOf(existingBook),
-                        1,
-                        b,
-                      );
-                    }
-                  }
-                  return uniqueBooks;
-                }, [])
-                .map((b: Book) => (
-                  <div
-                    className=""
-                    key={b.isbn13}
-                    onClick={() => getBook(b.isbn13)}
-                  >
-                    <BookOverview book={b}>
-                      <div
-                        key={`${b.isbn13}-Selector`}
-                        className="absolute top-0 flex h-full w-full select-none items-center justify-center bg-zinc-500/80 p-2 text-lg font-bold text-white opacity-0 transition-opacity duration-150 hover:cursor-pointer group-hover:opacity-100"
-                      >
-                        Add to library
-                      </div>
-                    </BookOverview>
-                  </div>
-                ))}
-            </div>
-          ) : (
-            ""
-          )}
-        </div>
-      </div>
-      <div></div>
       <MenuBar currentPage="Home" />
     </div>
   );
@@ -366,9 +128,153 @@ const StatChart = ({ read, all }: { read: number; all: number }) => {
     },
   } satisfies ChartConfig;
 
+  const chart2Data = [
+    { catagory: "Mystery", genre: 10 },
+    { catagory: "Suspense", genre: 4 },
+    { catagory: "Thriller", genre: 5 },
+    { catagory: "Crime", genre: 7 },
+    { catagory: "Romance", genre: 3 },
+    { catagory: "Friendship", genre: 1 },
+  ];
+  const chart2Config = {
+    genre: {
+      label: "Genre",
+      color: "hsl(var(--chart-1))",
+    },
+    label: {
+      color: "hsl(var(--background))",
+    },
+  } satisfies ChartConfig;
+
   return (
-    <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-1 items-center justify-center gap-4">
-      <Card className="flex flex-col">
+    <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4">
+      <Card className="h-full">
+        <CardContent>
+          <ChartContainer config={chart2Config}>
+            <BarChart
+              accessibilityLayer
+              data={chart2Data}
+              layout="vertical"
+              margin={{
+                right: 16,
+              }}
+            >
+              <CartesianGrid horizontal={false} />
+              <YAxis
+                dataKey="catagory"
+                type="category"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                tickFormatter={(value: string) => value.slice(0, 3)}
+                hide
+              />
+              <XAxis dataKey="genre" type="number" hide />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="line" />}
+              />
+              <Bar
+                dataKey="genre"
+                layout="vertical"
+                fill="var(--color-desktop)"
+                className="fill-primary text-white"
+                radius={4}
+              >
+                <LabelList
+                  dataKey="catagory"
+                  position="insideLeft"
+                  offset={8}
+                  className="fill-[--color-label]"
+                  fontSize={12}
+                />
+                <LabelList
+                  dataKey="genre"
+                  position="right"
+                  offset={8}
+                  className="fill-foreground"
+                  fontSize={12}
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
+        </CardContent>
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          <div className="flex gap-2 font-medium leading-none">
+            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Showing total visitors for the last 6 months
+          </div>
+        </CardFooter>
+      </Card>
+
+      <Card className="flex h-full flex-col sm:hidden">
+        <CardContent className="flex-1 p-2 pb-0">
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-square max-h-[250px]"
+          >
+            <RadialBarChart
+              data={chartData}
+              startAngle={90}
+              endAngle={-(360 * (percentageRead / 100)) + 90}
+              innerRadius={59}
+              outerRadius={85}
+              className="fill-primary"
+            >
+              <PolarGrid
+                gridType="circle"
+                radialLines={false}
+                stroke="none"
+                className="first:fill-muted last:fill-background"
+                polarRadius={[65, 52]}
+              />
+              <RadialBar dataKey="value" background cornerRadius={10} />
+              <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                        >
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-2xl font-bold md:text-4xl"
+                          >
+                            {percentageRead}%
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy ?? 0) + 24}
+                            className="fill-muted-foreground"
+                          >
+                            Read
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </PolarRadiusAxis>
+            </RadialBarChart>
+          </ChartContainer>
+        </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="flex items-center gap-2 font-medium leading-none">
+            {readBooks} out of {totalBooks} books read
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Keep up the great reading progress!
+          </div>
+        </CardFooter>
+      </Card>
+      <Card className="hidden h-full flex-col sm:flex">
         <CardContent className="flex-1 pb-0">
           <ChartContainer
             config={chartConfig}
