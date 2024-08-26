@@ -30,7 +30,7 @@ export default function Profile() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <NavBar selected="Profile" />
       <div className="flex h-full w-full items-center justify-center gap-4 pt-4">
         {/* <UserProfile path="/profile" /> */}

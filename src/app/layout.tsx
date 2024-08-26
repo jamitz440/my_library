@@ -4,6 +4,15 @@ import { Toaster } from "~/components/ui/toaster";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ReactQueryProvider } from "./ReactQueryProvider";
 import { ThemeProvider } from "~/components/theme-provider";
+import type { Viewport } from "next";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  minimumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "MyLibrary",

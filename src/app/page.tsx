@@ -20,6 +20,7 @@ import {
 } from "~/components/ui/chart";
 import { getStats } from "~/server/actions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Area, AreaChart } from "recharts";
 
 import {
   Label,
@@ -81,7 +82,7 @@ export interface Book {
 
 export default function Home() {
   return (
-    <div className="App min-h-screen bg-background">
+    <div className="bg-background">
       <NavBar selected="Home" />
 
       <StatsSection />
@@ -124,91 +125,12 @@ const StatChart = ({ read, all }: { read: number; all: number }) => {
   const chartConfig = {
     value: {
       label: "Read Books",
-      color: "hsl(var(--chart-1))",
-    },
-  } satisfies ChartConfig;
-
-  const chart2Data = [
-    { catagory: "Mystery", genre: 10 },
-    { catagory: "Suspense", genre: 4 },
-    { catagory: "Thriller", genre: 5 },
-    { catagory: "Crime", genre: 7 },
-    { catagory: "Romance", genre: 3 },
-    { catagory: "Friendship", genre: 1 },
-  ];
-  const chart2Config = {
-    genre: {
-      label: "Genre",
-      color: "hsl(var(--chart-1))",
-    },
-    label: {
-      color: "hsl(var(--background))",
+      color: "hsl(var(--primry))",
     },
   } satisfies ChartConfig;
 
   return (
     <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4">
-      <Card className="h-full">
-        <CardContent>
-          <ChartContainer config={chart2Config}>
-            <BarChart
-              accessibilityLayer
-              data={chart2Data}
-              layout="vertical"
-              margin={{
-                right: 16,
-              }}
-            >
-              <CartesianGrid horizontal={false} />
-              <YAxis
-                dataKey="catagory"
-                type="category"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tickFormatter={(value: string) => value.slice(0, 3)}
-                hide
-              />
-              <XAxis dataKey="genre" type="number" hide />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent indicator="line" />}
-              />
-              <Bar
-                dataKey="genre"
-                layout="vertical"
-                fill="var(--color-desktop)"
-                className="fill-primary text-white"
-                radius={4}
-              >
-                <LabelList
-                  dataKey="catagory"
-                  position="insideLeft"
-                  offset={8}
-                  className="fill-[--color-label]"
-                  fontSize={12}
-                />
-                <LabelList
-                  dataKey="genre"
-                  position="right"
-                  offset={8}
-                  className="fill-foreground"
-                  fontSize={12}
-                />
-              </Bar>
-            </BarChart>
-          </ChartContainer>
-        </CardContent>
-        <CardFooter className="flex-col items-start gap-2 text-sm">
-          <div className="flex gap-2 font-medium leading-none">
-            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-          </div>
-          <div className="leading-none text-muted-foreground">
-            Showing total visitors for the last 6 months
-          </div>
-        </CardFooter>
-      </Card>
-
       <Card className="flex h-full flex-col sm:hidden">
         <CardContent className="flex-1 p-2 pb-0">
           <ChartContainer
@@ -339,6 +261,62 @@ const StatChart = ({ read, all }: { read: number; all: number }) => {
           </div>
         </CardFooter>
       </Card>
+      <BarChartStats />
     </div>
+  );
+};
+
+const BarChartStats = () => {
+  const chartbData = [
+    { month: "January", books: 186 },
+    { month: "February", books: 305 },
+    { month: "March", books: 237 },
+    { month: "April", books: 73 },
+    { month: "May", books: 209 },
+    { month: "June", books: 214 },
+  ];
+  const chartbConfig = {
+    books: {
+      label: "Desktop",
+      color: "hsl(var(--chart-1))",
+    },
+  } satisfies ChartConfig;
+  return (
+    <Card className="col-span-2">
+      <CardContent>
+        <ChartContainer config={chartbConfig}>
+          <BarChart
+            accessibilityLayer
+            data={chartbData}
+            margin={{
+              top: 30,
+            }}
+            className="pt-2"
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value: string) => value.slice(0, 3)}
+            />
+            <Bar dataKey="books" fill="hsl(var(--primary))" radius={8}>
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
+            </Bar>
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <div className="leading-none text-muted-foreground">
+          Showing total books read for the last 6 months
+        </div>
+      </CardFooter>
+    </Card>
   );
 };

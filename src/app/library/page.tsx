@@ -6,7 +6,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import { getLibrary } from "~/server/actions";
-import Books from "./Books";
+import Books from "~/components/ui/Books";
 
 export default async function Library() {
   const queryClient = new QueryClient();

@@ -166,7 +166,7 @@ export default function Home() {
   };
 
   return (
-    <div className="App min-h-screen bg-background">
+    <div className="bg-background">
       <NavBar selected="Search" />
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-center p-4">
         <div className="flex w-full items-center justify-between gap-4">

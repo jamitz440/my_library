@@ -12,7 +12,6 @@ export async function getLibrary() {
       .select()
       .from(books)
       .where(and(eq(books.owned, true), eq(books.user_id, userId!)));
-    console.log(rawData);
 
     return rawData;
   } catch (error) {
@@ -26,7 +25,6 @@ export async function getWishlist() {
       .select()
       .from(books)
       .where(and(ne(books.owned, true), eq(books.user_id, userId!)));
-    console.log(rawData);
 
     return rawData;
   } catch (error) {

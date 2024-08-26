@@ -6,7 +6,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import { getWishlist } from "~/server/actions";
-import Books from "../library/Books";
+import Books from "~/components/ui/Books";
 
 export default async function Wishlist() {
   const queryClient = new QueryClient();
@@ -21,7 +21,7 @@ export default async function Wishlist() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <NavBar selected="Wishlist" />
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <HydrationBoundary state={dehydrate(queryClient)}>
