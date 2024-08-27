@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
       synopsis: req.book.synopsis,
       subjects: req.book.subjects,
       read: req.read,
+      readAt: req.read ? new Date() : null,
       owned: req.owned,
     });
     return new NextResponse(

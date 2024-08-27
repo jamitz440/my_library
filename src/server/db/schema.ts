@@ -35,6 +35,7 @@ export const books = createTable(
     synopsis: text("synopsis"),
     image: varchar("image"),
     read: boolean("read"),
+    readAt: timestamp("readAt", { withTimezone: true }),
     owned: boolean("owned"),
     theme: varchar("theme", { length: 256 }),
     subjects: varchar("subjects").array(),

@@ -2,7 +2,7 @@
 
 import { db } from "./db";
 import { books } from "./db/schema";
-import { count, sql, eq, ne, and } from "drizzle-orm";
+import { count, sql, eq, ne, and, gte, lte } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 
 export async function getLibrary() {
@@ -25,6 +25,31 @@ export async function getWishlist() {
       .select()
       .from(books)
       .where(and(ne(books.owned, true), eq(books.user_id, userId!)));
+
+    return rawData;
+  } catch (error) {
+    return { error: error };
+  }
+}
+
+export async function getBooksReadPerMonth() {
+  const { userId } = auth(); // Assuming you have an auth function to get the user ID
+
+  // Calculate the date six months ago
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+  try {
+    const rawData = await db
+      .select()
+      .from(books)
+      .where(
+        and(
+          eq(books.user_id, userId!),
+          gte(books.readAt, sixMonthsAgo),
+          eq(books.read, true),
+        ),
+      );
 
     return rawData;
   } catch (error) {

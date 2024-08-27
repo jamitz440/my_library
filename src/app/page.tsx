@@ -18,7 +18,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "~/components/ui/chart";
-import { getStats } from "~/server/actions";
+import { getStats, getBooksReadPerMonth } from "~/server/actions";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Area, AreaChart } from "recharts";
 
@@ -40,6 +40,10 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { type books } from "~/server/db/schema";
+import { type InferSelectModel } from "drizzle-orm";
+
+type Bookk = InferSelectModel<typeof books>;
 
 interface DimensionsStructured {
   length: {
@@ -261,20 +265,20 @@ const StatChart = ({ read, all }: { read: number; all: number }) => {
           </div>
         </CardFooter>
       </Card>
-      <BarChartStats />
+      <BarChartMonth />
     </div>
   );
 };
 
-const BarChartStats = () => {
-  const chartbData = [
-    { month: "January", books: 186 },
-    { month: "February", books: 305 },
-    { month: "March", books: 237 },
-    { month: "April", books: 73 },
-    { month: "May", books: 209 },
-    { month: "June", books: 214 },
-  ];
+type StatData = {
+  month: string;
+  books: number;
+};
+type BarChartStatsProps = {
+  chartbData: StatData[];
+};
+
+const BarChartStats = ({ chartbData }: BarChartStatsProps) => {
   const chartbConfig = {
     books: {
       label: "Desktop",
@@ -282,7 +286,7 @@ const BarChartStats = () => {
     },
   } satisfies ChartConfig;
   return (
-    <Card className="col-span-2">
+    <Card className="col-span-2 sm:col-span-1">
       <CardContent>
         <ChartContainer config={chartbConfig}>
           <BarChart
@@ -319,4 +323,107 @@ const BarChartStats = () => {
       </CardFooter>
     </Card>
   );
+};
+type GroupedBooks = Record<string, { month: string; count: number }>;
+
+const BarChartMonth: React.FC = () => {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  // Function to generate an array of all months in the range
+  function generateAllMonths(startDate: Date, endDate: Date): string[] {
+    const months: string[] = [];
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    start.setDate(1);
+    end.setDate(1);
+    end.setMonth(end.getMonth() + 1);
+
+    while (start < end) {
+      months.push(`${monthNames[start.getMonth()]} ${start.getFullYear()}`);
+      start.setMonth(start.getMonth() + 1);
+    }
+
+    return months;
+  }
+
+  // Function to group books by month
+  function groupBooksByMonth(books: Bookk[]): GroupedBooks {
+    return books.reduce((acc: GroupedBooks, book: Bookk) => {
+      if (book.read && book.readAt) {
+        const date = new Date(book.readAt);
+        const year = date.getFullYear();
+        const month = date.getMonth(); // JavaScript months are 0-based
+        const key = `${monthNames[month]} ${year}`;
+
+        if (!acc[key]) {
+          acc[key] = { month: key, count: 0 };
+        }
+
+        acc[key].count++;
+      }
+
+      return acc;
+    }, {});
+  }
+
+  // Function to ensure all months are included
+  function fillMissingMonths(
+    groupedBooks: GroupedBooks,
+    startDate: Date,
+    endDate: Date,
+  ): StatData[] {
+    const allMonths = generateAllMonths(startDate, endDate);
+    return allMonths.map((month) => ({
+      month,
+      books: groupedBooks[month]?.count ?? 0,
+    }));
+  }
+
+  const { data, error, isLoading } = useQuery<Bookk[], Error>({
+    queryKey: ["months"],
+    queryFn: async () => {
+      const result = await getBooksReadPerMonth();
+      return result as Bookk[];
+    },
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error.message}</div>;
+  }
+
+  if (data) {
+    // Adjust the start and end dates
+    const startDate = new Date(
+      Math.min(...data.map((book: Bookk) => new Date(book.readAt!).getTime())),
+    );
+    const endDate = new Date();
+
+    // Shift dates back by one month
+    startDate.setMonth(startDate.getMonth() - 1);
+    endDate.setMonth(endDate.getMonth() - 1);
+
+    const groupedBooks = groupBooksByMonth(data);
+    const chartbData = fillMissingMonths(groupedBooks, startDate, endDate);
+
+    return <BarChartStats chartbData={chartbData} />;
+  }
+
+  return null; // Fallback for when there's no data (although unlikely)
 };
