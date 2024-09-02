@@ -7,6 +7,7 @@ import {
   type FontAwesomeIconProps,
 } from "@fortawesome/react-fontawesome";
 import { faBadgeCheck } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
+import StarRating from "./StarRating";
 
 export default function Books({ page }: { page: "wishlist" | "library" }) {
   const { data, error, isLoading } = useQuery({
@@ -44,9 +45,6 @@ export default function Books({ page }: { page: "wishlist" | "library" }) {
             ) : (
               ""
             )}
-            <div className="absolute bottom-0 z-10 hidden h-full w-full bg-pink-500 group-hover:block">
-              hello
-            </div>
           </BookOverview>
         ))}
       </div>

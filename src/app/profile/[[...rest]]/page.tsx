@@ -19,40 +19,56 @@ export default function Profile() {
     "darkYellow",
     "green",
     "darkGreen",
+    "turquoise",
+    "darkTurquoise",
     "blue",
     "darkBlue",
     "purple",
     "darkPurple",
     "orange",
     "darkOrange",
+    "peach",
+    "darkPeach",
+    "pink",
+    "darkPink",
+    "gold",
+    "darkGold",
+    "silver",
+    "darkSilver",
+    "teal",
+    "darkTeal",
     "light",
     "dark",
   ];
 
   return (
-    <div className="bg-background">
+    <div className="min-h-screen bg-background">
       <NavBar selected="Profile" />
-      <div className="flex h-full w-full items-center justify-center gap-4 pt-4">
-        {/* <UserProfile path="/profile" /> */}
-        <Card>
-          <CardHeader>Themes</CardHeader>
-          <CardContent className="grid grid-cols-3 gap-4">
+      <div className="flex flex-col items-center px-4 py-8 sm:px-8">
+        <Card className="mb-8 w-full max-w-2xl">
+          <CardHeader>
+            <h2 className="text-center text-xl font-semibold">Themes</h2>
+          </CardHeader>
+          <CardContent className="grid grid-cols-5 justify-items-center gap-6 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
             {themes.map((t) => (
               <ThemeCircle key={t} theme={t} />
             ))}
           </CardContent>
         </Card>
-        <Card>
-          <SignedIn>
-            <Button>
-              <SignOutButton />
-            </Button>
-          </SignedIn>
-          <SignedOut>
-            <Button>
-              <SignInButton />
-            </Button>
-          </SignedOut>
+
+        <Card className="w-full max-w-sm">
+          <CardContent className="flex flex-col items-center justify-center pt-6">
+            <SignedIn>
+              <Button className="w-full">
+                <SignOutButton />
+              </Button>
+            </SignedIn>
+            <SignedOut>
+              <Button className="w-full">
+                <SignInButton />
+              </Button>
+            </SignedOut>
+          </CardContent>
         </Card>
       </div>
       <MenuBar currentPage="Profile" />
@@ -68,13 +84,14 @@ const ThemeCircle = ({ theme }: { theme: string }) => {
     setTheme(theme);
     setThemeTrigger(!themeTrigger);
   };
+
   return (
     <div
-      className={` ${theme == "light" ? "bg-white" : "bg-primary"} ${theme} relative aspect-square h-12 overflow-hidden rounded-full`}
+      className={`flex items-center justify-center ${theme == "light" ? "bg-white" : "bg-primary"} ${theme} aspect-square h-8 w-8 transform cursor-pointer overflow-hidden rounded-full transition-all duration-200 hover:scale-110`}
       onClick={() => handleThemeChange(theme)}
     >
       <div
-        className={`absolute bottom-0 right-0 h-14 w-14 bg-gradient-to-tl from-40% to-40% ${theme.includes("dark") ? "from-zinc-900" : "from-zinc-100"}`}
+        className={`absolute bottom-0 right-0 h-8 w-8 bg-gradient-to-tl from-40% to-40% ${theme.includes("dark") ? "from-zinc-900" : "from-zinc-100"}`}
       ></div>
     </div>
   );

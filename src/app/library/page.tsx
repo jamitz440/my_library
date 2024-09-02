@@ -23,6 +23,7 @@ export default async function Library() {
   return (
     <div className="min-h-screen bg-background">
       <NavBar selected="Library" />
+
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <HydrationBoundary state={dehydrate(queryClient)}>
           <Books page="library" />
