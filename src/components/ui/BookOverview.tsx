@@ -15,6 +15,7 @@ import { Button } from "./button";
 import { Input } from "./input";
 import { Checkbox } from "./checkbox";
 import StarRating from "./StarRating";
+import { Skeleton } from "./skeleton";
 
 type Book = InferSelectModel<typeof books>;
 
@@ -170,6 +171,29 @@ export const BookOverview = ({
             />
           )}
         </div>
+      </div>
+    </Card>
+  );
+};
+
+BookOverview.Loading = function BookOverviewLoading({
+  page,
+}: {
+  page: string;
+}) {
+  return (
+    <Card className="flex flex-col gap-2 p-2">
+      <div>
+        <Skeleton className="mx-auto aspect-book w-full rounded-sm rounded-e-xl" />
+      </div>
+      <div className="flex h-auto flex-col">
+        <Skeleton className="mb-2 mr-auto h-[20px] w-3/4 rounded-full" />
+        <Skeleton className="mb-2 mr-auto h-[10px] w-1/2 rounded-full" />
+        {page == "wishlist" ? (
+          <div className="h-4"></div>
+        ) : (
+          <Skeleton className="mx-auto mt-3 h-[20px] w-1/2 min-w-32 rounded-full" />
+        )}
       </div>
     </Card>
   );

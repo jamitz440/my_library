@@ -22,9 +22,16 @@ export default function Books({ page }: { page: "wishlist" | "library" }) {
       }
     },
     staleTime: 1000,
+    refetchOnMount: true,
   });
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="mb-16 grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        {[...Array<number>(5)].map((_, index) => (
+          <BookOverview.Loading key={index} page={page} />
+        ))}
+      </div>
+    );
   }
   if (error ?? !Array.isArray(data)) {
     console.log(error ?? data);
