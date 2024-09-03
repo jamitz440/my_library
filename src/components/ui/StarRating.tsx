@@ -63,7 +63,25 @@ export default function StarRating({
   );
 }
 
-function Star({ onClick, full, onHoverIn, onHoverOut, color, size, dynamic }) {
+type Star = {
+  onClick: () => void;
+  full: boolean;
+  onHoverIn: () => void;
+  onHoverOut: () => void;
+  color: string;
+  size: number;
+  dynamic: boolean;
+};
+
+function Star({
+  onClick,
+  full,
+  onHoverIn,
+  onHoverOut,
+  color,
+  size,
+  dynamic,
+}: Star) {
   const starStyle = {
     width: `${size}px`,
     height: `${size}px`,

@@ -11,6 +11,7 @@ import { Card, CardContent, CardFooter } from "~/components/ui/card";
 import { type books } from "~/server/db/schema";
 import { type InferSelectModel } from "drizzle-orm";
 import ReadStats from "~/components/ui/stats/readStats";
+import { Skeleton } from "~/components/ui/skeleton";
 
 type Bookk = InferSelectModel<typeof books>;
 
@@ -82,6 +83,7 @@ const StatsSection = () => {
     return (
       <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4">
         <ReadStats.Loading />
+        <BarChartMonth.Loading />
       </div>
     );
   }
@@ -92,95 +94,11 @@ const StatsSection = () => {
     return (
       <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4">
         <ReadStats read={data.readBooks} all={data.totalBooks} />
+        <BarChartMonth />
       </div>
     );
   }
 };
-
-// const StatChart = ({ read, all }: { read: number; all: number }) => {
-//   const totalBooks = all;
-//   const readBooks = read;
-//   const percentageRead = Math.round((readBooks / totalBooks) * 100);
-//   const chartData = [{ name: "Read Books", value: percentageRead }];
-
-//   const chartConfig = {
-//     value: {
-//       label: "Read Books",
-//       color: "hsl(var(--primry))",
-//     },
-//   } satisfies ChartConfig;
-
-//   return (
-//     <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4">
-//       <Card className="hidden h-full flex-col sm:flex">
-//         <CardContent className="flex-1 pb-0">
-//           <ChartContainer
-//             config={chartConfig}
-//             className="mx-auto aspect-square max-h-[250px]"
-//           >
-//             <RadialBarChart
-//               data={chartData}
-//               startAngle={90}
-//               endAngle={-(360 * (percentageRead / 100)) + 90}
-//               innerRadius={80}
-//               outerRadius={110}
-//               className="fill-primary"
-//             >
-//               <PolarGrid
-//                 gridType="circle"
-//                 radialLines={false}
-//                 stroke="none"
-//                 className="first:fill-muted last:fill-background"
-//                 polarRadius={[86, 74]}
-//               />
-//               <RadialBar dataKey="value" background cornerRadius={10} />
-//               <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-//                 <Label
-//                   content={({ viewBox }) => {
-//                     if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-//                       return (
-//                         <text
-//                           x={viewBox.cx}
-//                           y={viewBox.cy}
-//                           textAnchor="middle"
-//                           dominantBaseline="middle"
-//                         >
-//                           <tspan
-//                             x={viewBox.cx}
-//                             y={viewBox.cy}
-//                             className="fill-foreground text-4xl font-bold"
-//                           >
-//                             {percentageRead}%
-//                           </tspan>
-//                           <tspan
-//                             x={viewBox.cx}
-//                             y={(viewBox.cy ?? 0) + 24}
-//                             className="fill-muted-foreground"
-//                           >
-//                             Read
-//                           </tspan>
-//                         </text>
-//                       );
-//                     }
-//                   }}
-//                 />
-//               </PolarRadiusAxis>
-//             </RadialBarChart>
-//           </ChartContainer>
-//         </CardContent>
-//         <CardFooter className="flex-col gap-2 text-sm">
-//           <div className="flex items-center gap-2 font-medium leading-none">
-//             {readBooks} out of {totalBooks} books read
-//           </div>
-//           <div className="leading-none text-muted-foreground">
-//             Keep up the great reading progress!
-//           </div>
-//         </CardFooter>
-//       </Card>
-//       <BarChartMonth />
-//     </div>
-//   );
-// };
 
 type StatData = {
   month: string;
@@ -238,7 +156,7 @@ const BarChartStats = ({ chartbData }: BarChartStatsProps) => {
 };
 type GroupedBooks = Record<string, { month: string; count: number }>;
 
-const BarChartMonth: React.FC = () => {
+const BarChartMonth = () => {
   const monthNames = [
     "January",
     "February",
@@ -313,7 +231,7 @@ const BarChartMonth: React.FC = () => {
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <BarChartMonth.Loading />;
   }
 
   if (error) {
@@ -338,4 +256,49 @@ const BarChartMonth: React.FC = () => {
   }
 
   return null; // Fallback for when there's no data (although unlikely)
+};
+
+BarChartMonth.Loading = function BarChartMonth() {
+  const chartConfig = {
+    books: {
+      label: "Desktop",
+      color: "hsl(var(--chart-1))",
+    },
+  } satisfies ChartConfig;
+
+  return (
+    <Card className="col-span-2 sm:col-span-1">
+      <CardContent>
+        <ChartContainer config={chartConfig}>
+          <BarChart
+            accessibilityLayer
+            margin={{
+              top: 30,
+            }}
+            className="pt-2"
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value: string) => value.slice(0, 3)}
+            />
+            <Bar dataKey="books" fill="hsl(var(--primary))" radius={8}>
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
+            </Bar>
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <Skeleton className="mr-auto h-4 w-5/6 rounded-full" />
+      </CardFooter>
+    </Card>
+  );
 };

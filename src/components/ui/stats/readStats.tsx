@@ -24,7 +24,7 @@ function ReadStats({ read, all }: { read: number; all: number }) {
   } satisfies ChartConfig;
 
   return (
-    <Card className="flex h-full flex-col sm:hidden">
+    <Card className="flex h-full flex-col">
       <CardContent className="flex-1 p-2 pb-0">
         <ChartContainer
           config={chartConfig}
@@ -94,7 +94,7 @@ function ReadStats({ read, all }: { read: number; all: number }) {
 
 ReadStats.Loading = function ReadStatsLoading() {
   return (
-    <Card className="flex h-full flex-col sm:hidden">
+    <Card className="flex h-full flex-col pb-1 sm:hidden">
       <CardContent className="flex-1 p-2 pb-0">
         <Skeleton className="m-5 mx-auto h-[120px] w-[120px] rounded-full" />
       </CardContent>
