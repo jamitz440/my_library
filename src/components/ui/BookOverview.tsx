@@ -261,7 +261,9 @@ const DialogPopUp = ({
                   setDialog(false);
                   setFormData(defaultData);
                 }}
-              ></AlertDialogAction>
+              >
+                Close Dialog
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
