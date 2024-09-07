@@ -97,7 +97,7 @@ const StatsSection = () => {
   });
   if (isLoading) {
     return (
-      <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4">
+      <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4 md:grid-cols-3">
         <ReadStats.Loading />
         <BarChartMonth.Loading />
       </div>
@@ -108,7 +108,7 @@ const StatsSection = () => {
   }
   if (data) {
     return (
-      <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4">
+      <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4 md:grid-cols-3">
         <ReadStats read={data.readBooks} all={data.totalBooks} />
         <RadialStats />
         <BarChartMonth />
@@ -131,7 +131,7 @@ const RadialStats = () => {
     },
   } satisfies ChartConfig;
 
-  const totalVisitors = chartData[0].desktop + chartData[0].mobile;
+  const totalVisitors = chartData[0]!.desktop + chartData[0]!.mobile;
 
   return (
     <Card className="flex flex-col">
@@ -168,7 +168,7 @@ const RadialStats = () => {
                           y={(viewBox.cy ?? 0) + 4}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          Books
                         </tspan>
                       </text>
                     );

@@ -2,22 +2,26 @@ import { NextResponse } from "next/server";
 import { books } from "~/server/db/schema";
 import { db } from "~/server/db";
 import { type NextRequest } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
-type Request = {
+interface reqData {
   id: number;
-  formData: FormData;
-};
-type FormData = {
+  formData: Form;
+}
+
+type Form = {
   title: string;
   author: string;
   owned: boolean;
   read: boolean;
   rating: number;
+  review: string;
+
 };
+
 export async function POST(request: NextRequest) {
-  const req = (await request.json()) as Request;
-  console.log(req);
+  const req = (await request.json()) as reqData;
+  console.log(req.formData.title);
   try {
     await db
       .update(books)
@@ -27,6 +31,9 @@ export async function POST(request: NextRequest) {
         owned: req.formData.owned,
         read: req.formData.read,
         rating: req.formData.rating,
+        review: req.formData.review,
+        readAt: sql`CASE WHEN ${books.read} = false AND ${sql.raw(req.formData.read.toString())} = true THEN CURRENT_TIMESTAMP ELSE ${books.readAt} END`,
+
       })
       .where(eq(books.id, req.id));
 

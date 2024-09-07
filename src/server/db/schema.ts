@@ -24,7 +24,7 @@ export const createTable = pgTableCreator((name) => `my_library_${name}`);
 export const books = createTable(
   "book",
   {
-    id: serial("id").primaryKey(),
+    id: serial("id").primaryKey().notNull(),
     title: varchar("title", { length: 256 }).notNull(),
     user_id: varchar("user_id", { length: 256 }),
     rating: integer("rating"),
@@ -48,5 +48,18 @@ export const books = createTable(
   },
   (example) => ({
     titleIndex: index("title_idx").on(example.title),
+  }),
+);
+
+export const user = createTable(
+  "user",
+  {
+    id: serial("id").primaryKey().notNull(),
+    user_id: varchar("user_id", { length: 256 }),
+    goal: integer("goal"),
+    theme: varchar("theme", { length: 256 }),
+  },
+  (example) => ({
+    titleIndex: index("title_idx").on(example.user_id),
   }),
 );

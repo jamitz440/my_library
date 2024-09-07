@@ -7,7 +7,6 @@ import {
   type FontAwesomeIconProps,
 } from "@fortawesome/react-fontawesome";
 import { faBadgeCheck } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
-import StarRating from "./StarRating";
 
 export default function Books({ page }: { page: "wishlist" | "library" }) {
   const { data, error, isLoading } = useQuery({

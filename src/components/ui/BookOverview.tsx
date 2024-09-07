@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState, type ReactNode } from "react";
+import React, { useState, type ReactNode } from "react";
 import { Card } from "./card";
 import { type books } from "~/server/db/schema";
 import { type InferSelectModel } from "drizzle-orm";
@@ -25,10 +25,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
 import { useQueryClient } from "@tanstack/react-query";
-
+import { Textarea } from "~/components/ui/textarea";
+import { Label } from "~/components/ui/label";
 type Book = InferSelectModel<typeof books>;
 
 export const BookOverview = ({
@@ -122,16 +122,25 @@ const DialogPopUp = ({
     owned: book.owned,
     read: book.read,
     rating: book.rating,
+    review: book.review,
   };
 
   const [formData, setFormData] = useState(defaultData);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    console.log(e.target.type);
+    console.log(formData);
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
+  };
+
+  const handleReviewChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      review: e.target.value,
+    });
+    console.log(formData);
   };
 
   const [alert, setAlert] = useState(false);
@@ -155,14 +164,6 @@ const DialogPopUp = ({
     await queryClient.invalidateQueries({ queryKey: ["library"] });
     await queryClient.invalidateQueries({ queryKey: ["wishlist"] });
     await queryClient.invalidateQueries({ queryKey: ["stats"] });
-    setDialog(false);
-  };
-
-  const handleUpdate = async () => {
-    // toast({
-    //   title: `Added to Library`,
-    //   description: `${book?.title} - ${book?.authors ? book?.authors[0] : ""}`,
-    // });
 
     setDialog(false);
   };
@@ -192,29 +193,38 @@ const DialogPopUp = ({
         >
           <div className="flex flex-col gap-4">
             <div className="text-ellipsis text-lg">
-              Title:{" "}
+              <Label htmlFor="title">Title:</Label>
               <Input
+                id="title"
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
               />
             </div>
             <div className="text-lg">
-              Author:{" "}
+              <Label htmlFor="author">Author:</Label>
               <Input
+                id="author"
                 name="author"
                 value={formData.author}
                 onChange={handleInputChange}
               />
             </div>
-            <div className="flex pt-2">
-              <label htmlFor="rating">Rating: </label>
+            <div className="flex flex-col gap-2 pt-2">
+              <Label htmlFor="rating">Your rating:</Label>
               <StarRating
                 maxRating={5}
                 defaultRating={book.rating!}
                 size={32}
                 className="mx-auto"
                 onSetRating={handleRating}
+              />
+              <Label htmlFor="message">Your review:</Label>
+              <Textarea
+                placeholder="Type your review here."
+                id="message"
+                value={formData.review!}
+                onChange={handleReviewChange}
               />
             </div>
             <div className="flex items-center justify-around gap-2 pt-2">
