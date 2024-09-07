@@ -1,6 +1,6 @@
 // StarRating.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const containerStyle = {
   display: "flex",
@@ -32,6 +32,7 @@ export default function StarRating({
   defaultRating = 0,
   onSetRating,
   dynamic = true,
+
 }: StarRatingProps) {
   const [rating, setRating] = useState(defaultRating);
   const [tempRating, setTempRating] = useState(0);
@@ -42,6 +43,10 @@ export default function StarRating({
       onSetRating(newRating);
     }
   }
+
+  useEffect(() => {
+    setRating(defaultRating)
+  },[defaultRating])
 
   return (
     <div style={containerStyle} className={`${className} cursor-default`}>

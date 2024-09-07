@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Book = InferSelectModel<typeof books>;
 
@@ -140,9 +141,29 @@ const DialogPopUp = ({
     console.log(rating);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const queryClient = useQueryClient();
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Perform save action here
+    const res = await fetch("api/updateBook", {
+      method: "POST",
+      body: JSON.stringify({
+        id: book.id,
+        formData: formData,
+      }),
+    });
+    await queryClient.invalidateQueries({ queryKey: ["library"] });
+    await queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    await queryClient.invalidateQueries({ queryKey: ["stats"] });
+    setDialog(false);
+  };
+
+  const handleUpdate = async () => {
+    // toast({
+    //   title: `Added to Library`,
+    //   description: `${book?.title} - ${book?.authors ? book?.authors[0] : ""}`,
+    // });
+
     setDialog(false);
   };
 
@@ -150,9 +171,10 @@ const DialogPopUp = ({
     const hasChanges = JSON.stringify(defaultData) !== JSON.stringify(formData);
     if (!hasChanges) {
       setDialog(false);
+      setAlert(false);
     } else {
-      // Optionally, you can show a confirmation dialog here
       setAlert(true);
+      // Optionally, you can show a confirmation dialog here
     }
   };
   return (

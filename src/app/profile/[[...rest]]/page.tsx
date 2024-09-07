@@ -1,7 +1,6 @@
 "use client";
 import { MenuBar } from "~/components/ui/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
-import { UserProfile } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
