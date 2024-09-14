@@ -29,6 +29,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
+import { useRouter } from "next/navigation";
 type Book = InferSelectModel<typeof books>;
 
 export const BookOverview = ({
@@ -38,7 +39,12 @@ export const BookOverview = ({
   book: Book;
   children?: ReactNode;
 }) => {
-  const [dialog, setDialog] = useState(false);
+  const router = useRouter(); // Initialize useRouter hook
+
+  const navigateToBookPage = () => {
+    router.push(`/book/${book.id}`); // Navigate to the dynamic route
+  };
+
   return (
     <Card key={book.title} className="relative flex h-full flex-col gap-2 p-2">
       <div
@@ -54,12 +60,11 @@ export const BookOverview = ({
         />
         {children}
         <div
-          onClick={() => setDialog(true)}
+          onClick={navigateToBookPage} // Change the onClick to navigate to the dynamic page
           className="absolute bottom-0 z-10 flex h-full w-full select-none items-center justify-center bg-zinc-800/80 text-2xl font-bold text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100"
         >
-          Edit book
+          View book
         </div>
-        <DialogPopUp dialog={dialog} setDialog={setDialog} book={book} />
       </div>
       <div className="flex h-auto flex-col">
         <div className="flex max-w-full items-start justify-start whitespace-nowrap text-sm font-bold">

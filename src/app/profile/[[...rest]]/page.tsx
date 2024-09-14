@@ -1,5 +1,5 @@
 "use client";
-import { MenuBar } from "~/components/ui/MenuBar";
+import { MenuBar } from "~/components/ui/menuBar/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
 import { useTheme } from "next-themes";
 import { useState } from "react";
@@ -11,33 +11,19 @@ import { SignedIn, SignedOut } from "@clerk/clerk-react";
 export default function Profile() {
   const themes = [
     "red",
-    "darkRed",
     "rose",
-    "darkRose",
     "yellow",
-    "darkYellow",
     "green",
-    "darkGreen",
     "turquoise",
-    "darkTurquoise",
     "blue",
-    "darkBlue",
     "purple",
-    "darkPurple",
     "orange",
-    "darkOrange",
     "peach",
-    "darkPeach",
     "pink",
-    "darkPink",
     "gold",
-    "darkGold",
     "silver",
-    "darkSilver",
     "teal",
-    "darkTeal",
-    "light",
-    "dark",
+    "black",
   ];
 
   return (
@@ -76,7 +62,7 @@ export default function Profile() {
 }
 
 const ThemeCircle = ({ theme }: { theme: string }) => {
-  const { setTheme } = useTheme();
+  const { setTheme, theme: currentTheme } = useTheme();
   const [themeTrigger, setThemeTrigger] = useState(false);
 
   const handleThemeChange = (theme: string) => {
@@ -86,12 +72,12 @@ const ThemeCircle = ({ theme }: { theme: string }) => {
 
   return (
     <div
-      className={`flex items-center justify-center ${theme == "light" ? "bg-white" : "bg-primary"} ${theme} aspect-square h-8 w-8 transform cursor-pointer overflow-hidden rounded-full transition-all duration-200 hover:scale-110`}
+      className={`${
+        theme === currentTheme
+          ? `border-4 ${theme === "black" ? "border-zinc-500" : "border-black"}`
+          : ""
+      } flex aspect-square h-8 w-8 transform cursor-pointer items-center justify-center rounded-full ${theme} bg-primary transition-all duration-200 hover:scale-110`}
       onClick={() => handleThemeChange(theme)}
-    >
-      <div
-        className={`absolute bottom-0 right-0 h-8 w-8 bg-gradient-to-tl from-40% to-40% ${theme.includes("dark") ? "from-zinc-900" : "from-zinc-100"}`}
-      ></div>
-    </div>
+    ></div>
   );
 };

@@ -19,8 +19,8 @@ import {
 } from "~/components/ui/chart";
 import { getStats, getBooksReadPerMonth } from "~/server/actions";
 import { useQuery } from "@tanstack/react-query";
-
-import { MenuBar } from "~/components/ui/MenuBar";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import { MenuBar } from "~/components/ui/menuBar/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
 import { Card, CardContent, CardFooter } from "~/components/ui/card";
 import { type books } from "~/server/db/schema";
@@ -28,6 +28,17 @@ import { type InferSelectModel } from "drizzle-orm";
 import ReadStats from "~/components/ui/stats/readStats";
 import { Skeleton } from "~/components/ui/skeleton";
 import { TrendingUp } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { SignInButton } from "@clerk/nextjs";
+import {
+  faBookOpenCover,
+  faHeart,
+  faStar,
+} from "@awesome.me/kit-30477fcccd/icons/classic/solid";
+import {
+  FontAwesomeIcon,
+  type FontAwesomeIconProps,
+} from "@fortawesome/react-fontawesome";
 
 type Bookk = InferSelectModel<typeof books>;
 
@@ -74,13 +85,72 @@ export default function Home() {
   return (
     <div className="bg-background">
       <NavBar selected="Home" />
-
-      <StatsSection />
-
+      <SignedIn>
+        <StatsSection />
+      </SignedIn>
+      <SignedOut>
+        <LandingPage />
+      </SignedOut>
       <MenuBar currentPage="Home" />
     </div>
   );
 }
+
+const LandingPage = () => {
+  return (
+    <div className="flex min-h-[calc(100vh-140px)] flex-1 flex-col items-center justify-center bg-background px-4">
+      <Card className="max-w-lg border-0 text-center shadow-none">
+        <CardContent>
+          <h1 className="mb-6 text-4xl font-bold">
+            Welcome to Your Personal Library
+          </h1>
+          <p className="mb-8 text-muted-foreground">
+            Organize, rate, and wishlist your favorite books. Take control of
+            your reading experience.
+          </p>
+          <div className="mb-6 flex justify-around">
+            <Feature
+              icon={faBookOpenCover as FontAwesomeIconProps["icon"]}
+              label="Track your books"
+            />
+            <Feature
+              icon={faStar as FontAwesomeIconProps["icon"]}
+              label="Rate your reads"
+            />
+            <Feature
+              icon={faHeart as FontAwesomeIconProps["icon"]}
+              label="Save your wishlist"
+            />
+          </div>
+          <SignInButton>
+            <Button className="w-full bg-primary text-white">
+              Get Started
+            </Button>
+          </SignInButton>
+        </CardContent>
+        <CardFooter className="flex items-center justify-center text-muted-foreground">
+          <p>Join today and start building your dream library.</p>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
+
+// Helper component for displaying feature icons with text
+const Feature = ({
+  icon,
+  label,
+}: {
+  icon: FontAwesomeIconProps["icon"];
+  label: string;
+}) => (
+  <div className="flex flex-col items-center">
+    <div className="mb-2 text-primary">
+      <FontAwesomeIcon icon={icon} />{" "}
+    </div>
+    <p className="text-sm font-medium">{label}</p>
+  </div>
+);
 
 const StatsSection = () => {
   interface Stats {

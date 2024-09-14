@@ -28,11 +28,10 @@ import {
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { useToast } from "~/components/ui/use-toast";
-import { MenuBar } from "~/components/ui/MenuBar";
+import { MenuBar } from "~/components/ui/menuBar/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
 import { BookSearchOverview } from "~/components/ui/BookSearchOverview";
 import { Checkbox } from "~/components/ui/checkbox";
-import { useTheme } from "next-themes";
 import { type books } from "~/server/db/schema";
 import { type InferSelectModel } from "drizzle-orm";
 
@@ -122,6 +121,13 @@ export default function Home() {
   };
 
   const handleAdd = async () => {
+    if (!user) {
+      toast({
+        title: `Sign in to add a book to your library`,
+        variant: "destructive",
+      });
+      return;
+    }
     const res = await fetch("api/addToLibrary", {
       method: "POST",
       body: JSON.stringify({
@@ -144,7 +150,6 @@ export default function Home() {
   const handleReset = () => {
     setBook(null);
     setDialog(false);
-    setOpen(true);
   };
 
   const handleSearch = async () => {

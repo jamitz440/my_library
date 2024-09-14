@@ -125,3 +125,8 @@ export async function addBook({
     return { success: false, error: error };
   }
 }
+
+export async function getBook(id: number) {
+  const book = await db.select().from(books).where(eq(books.id, id));
+  return book[0];
+}
