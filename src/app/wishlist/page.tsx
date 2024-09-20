@@ -32,7 +32,7 @@ export default async function Wishlist() {
     <div className="bg-background">
       <NavBar selected="Wishlist" />
       <SignedIn>
-        <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
+        <div className="p-4">
           <HydrationBoundary state={dehydrate(queryClient)}>
             <Books page="wishlist" />
           </HydrationBoundary>

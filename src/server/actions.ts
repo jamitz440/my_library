@@ -32,6 +32,19 @@ export async function getWishlist() {
   }
 }
 
+export async function getSharedWishlist(id: string) {
+  try {
+    const rawData = await db
+      .select()
+      .from(books)
+      .where(and(ne(books.owned, true), eq(books.user_id, id)));
+
+    return rawData;
+  } catch (error) {
+    return { error: error };
+  }
+}
+
 export async function getBooksReadPerMonth() {
   const { userId } = auth(); // Assuming you have an auth function to get the user ID
 
@@ -129,4 +142,26 @@ export async function addBook({
 export async function getBook(id: number) {
   const book = await db.select().from(books).where(eq(books.id, id));
   return book[0];
+}
+
+export async function deleteBook(id: number) {
+  const res = await db.delete(books).where(eq(books.id, id)).returning();
+  if (res) {
+    return { success: true };
+  } else {
+    return { success: false };
+  }
+}
+
+export async function reserveBook(id: number, name: string) {
+  const res = await db
+    .update(books)
+    .set({ reservedBy: name })
+    .where(eq(books.id, id));
+
+  if (res) {
+    return { success: true };
+  } else {
+    return { success: false };
+  }
 }

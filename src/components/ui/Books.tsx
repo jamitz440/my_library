@@ -42,7 +42,7 @@ export default function Books({ page }: { page: "wishlist" | "library" }) {
   if (data) {
     return (
       <>
-        <div className="mb-4 flex items-center justify-center gap-4">
+        <div className="mb-4 flex w-full items-center justify-center gap-4">
           <div>Search</div>
           <Input value={filter} onChange={(e) => setFilter(e.target.value)} />
         </div>

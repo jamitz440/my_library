@@ -39,6 +39,7 @@ export const books = createTable(
     owned: boolean("owned"),
     theme: varchar("theme", { length: 256 }),
     subjects: varchar("subjects").array(),
+    reservedBy: varchar("reserved"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
@@ -60,6 +61,6 @@ export const user = createTable(
     theme: varchar("theme", { length: 256 }),
   },
   (example) => ({
-    titleIndex: index("title_idx").on(example.user_id),
+    titleIndex: index("user_idx").on(example.user_id),
   }),
 );

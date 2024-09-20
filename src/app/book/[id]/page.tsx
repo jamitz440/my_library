@@ -2,7 +2,7 @@
 import { MenuBar } from "~/components/ui/menuBar/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getBook } from "~/server/actions";
+import { deleteBook, getBook } from "~/server/actions";
 import { type InferSelectModel } from "drizzle-orm";
 import { type books } from "~/server/db/schema";
 import { Card } from "~/components/ui/card";
@@ -24,6 +24,7 @@ import {
   AlertDialogTitle,
 } from "~/components/ui/alert-dialog";
 import { useToast } from "~/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 type Book = InferSelectModel<typeof books>;
 
@@ -34,7 +35,7 @@ export default function BookPage({ params }: { params: { id: number } }) {
     error,
     isLoading,
   } = useQuery<Book, Error>({
-    queryKey: [params.id],
+    queryKey: ["book", params.id],
     queryFn: async () => {
       const result = await getBook(params.id);
       return result as Book;
@@ -59,7 +60,7 @@ export default function BookPage({ params }: { params: { id: number } }) {
     if (book) {
       setFormData({
         title: book.title || "",
-        author: book.authors![0]!,
+        author: book.authors?.[0] ?? "",
         owned: book.owned ?? false,
         read: book.read ?? false,
         rating: book.rating ?? 0,
@@ -92,24 +93,53 @@ export default function BookPage({ params }: { params: { id: number } }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/updateBook", {
-      method: "POST",
-      body: JSON.stringify({
-        id: book?.id,
-        formData: formData,
-      }),
-    });
-
-    toast({
-      title: `Successfully edited book`,
-    });
-    setEditing(false); // Exit edit mode
-    await queryClient.invalidateQueries({ queryKey: ["library"] });
-    await queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    try {
+      const res = await fetch("/api/updateBook", {
+        method: "POST",
+        body: JSON.stringify({
+          id: book?.id,
+          formData,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update the book");
+      }
+      toast({ title: "Successfully edited book" });
+      setEditing(false);
+      await queryClient.invalidateQueries({ queryKey: ["library"] });
+      await queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error updating book",
+        variant: "destructive",
+      });
+    }
   };
 
-  const warn = () => {
+  const warn = (e: React.FormEvent) => {
+    e.preventDefault();
     setAlert(true);
+  };
+
+  const router = useRouter();
+
+  const handleDelete = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await deleteBook(book!.id);
+      if (!res.success) {
+        throw new Error("Failed to delete the book");
+      }
+      toast({ title: `${book?.title} successfully deleted` });
+      router.push("/library"); // Redirect to a specific page
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error deleting book",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoading) {
@@ -154,7 +184,7 @@ export default function BookPage({ params }: { params: { id: number } }) {
       {/* Main Content */}
       <div className="relative -mt-32 flex flex-col items-center px-4 py-4 sm:px-8">
         {/* Book Cover */}
-        <div className="relative z-10 mx-auto aspect-book h-56 overflow-hidden rounded-lg shadow-lg sm:h-64 sm:w-48">
+        <div className="relative z-10 mx-auto aspect-book h-56 overflow-hidden rounded-lg shadow-lg sm:h-64">
           <img
             src={book?.image ?? "/placeholder.png"}
             alt={book?.title}
@@ -209,7 +239,7 @@ export default function BookPage({ params }: { params: { id: number } }) {
                     id="read"
                     name="read"
                     checked={formData.read}
-                    onClick={() =>
+                    onChange={() =>
                       setFormData({ ...formData, read: !formData.read })
                     }
                   />
@@ -229,7 +259,7 @@ export default function BookPage({ params }: { params: { id: number } }) {
                     id="owned"
                     name="owned"
                     checked={formData.owned}
-                    onClick={() =>
+                    onChange={() =>
                       setFormData({ ...formData, owned: !formData.owned })
                     }
                   />
@@ -296,9 +326,7 @@ export default function BookPage({ params }: { params: { id: number } }) {
             <AlertDialogCancel onClick={() => setAlert(false)}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction
-            // delete book from data
-            >
+            <AlertDialogAction type="button" onClick={handleDelete}>
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
