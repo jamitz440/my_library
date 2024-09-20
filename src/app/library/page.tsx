@@ -28,7 +28,7 @@ export default async function Library() {
     <div className="min-h-screen bg-background">
       <NavBar selected="Library" />
       <SignedIn>
-        <div className="p-4">
+        <div className="mx-auto max-w-screen-xl p-4">
           <HydrationBoundary state={dehydrate(queryClient)}>
             <Books page="library" />
           </HydrationBoundary>

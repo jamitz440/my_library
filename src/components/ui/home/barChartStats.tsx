@@ -105,7 +105,7 @@ export const BarChartMonth = () => {
       if (book.read && book.readAt) {
         const date = new Date(book.readAt);
         const year = date.getFullYear();
-        const month = date.getMonth(); // JavaScript months are 0-based
+        const month = date.getMonth();
         const key = `${monthNames[month]} ${year}`;
 
         if (!acc[key]) {
@@ -149,23 +149,25 @@ export const BarChartMonth = () => {
   }
 
   if (data) {
-    // Adjust the start and end dates
-    const startDate = new Date(
-      Math.min(...data.map((book: Book) => new Date(book.readAt!).getTime())),
-    );
     const endDate = new Date();
+    const startDate = new Date();
+    startDate.setMonth(endDate.getMonth() - 5); // Last 6 months
 
-    // Shift dates back by one month
-    startDate.setMonth(startDate.getMonth() - 1);
-    endDate.setMonth(endDate.getMonth() - 1);
+    const filteredBooks = data.filter((book: Book) => {
+      if (book.read && book.readAt) {
+        const readDate = new Date(book.readAt);
+        return readDate >= startDate && readDate <= endDate;
+      }
+      return false;
+    });
 
-    const groupedBooks = groupBooksByMonth(data);
+    const groupedBooks = groupBooksByMonth(filteredBooks);
     const chartbData = fillMissingMonths(groupedBooks, startDate, endDate);
 
     return <BarChartStats chartbData={chartbData} />;
   }
 
-  return null; // Fallback for when there's no data (although unlikely)
+  return null;
 };
 
 BarChartMonth.Loading = function BarChartMonth() {

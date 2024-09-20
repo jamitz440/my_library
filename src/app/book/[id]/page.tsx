@@ -239,7 +239,7 @@ export default function BookPage({ params }: { params: { id: number } }) {
                     id="read"
                     name="read"
                     checked={formData.read}
-                    onChange={() =>
+                    onClick={() =>
                       setFormData({ ...formData, read: !formData.read })
                     }
                   />
@@ -259,7 +259,7 @@ export default function BookPage({ params }: { params: { id: number } }) {
                     id="owned"
                     name="owned"
                     checked={formData.owned}
-                    onChange={() =>
+                    onClick={() =>
                       setFormData({ ...formData, owned: !formData.owned })
                     }
                   />
