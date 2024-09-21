@@ -61,7 +61,7 @@ const onboardingSteps = [
 ];
 
 export default function Home() {
-  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const handleFinishOnboarding = () => {
     setShowOnboarding(false);
