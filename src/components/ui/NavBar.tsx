@@ -37,7 +37,7 @@ export const NavBar = ({ selected }: { selected: string }) => {
   const MemoizedProfileButton = React.memo(ProfileButton);
   const { user } = useUser();
   return (
-    <nav className="border-b border-border">
+    <nav className="border-b border-border" id="navbar">
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4">
         <Link
           href="/"

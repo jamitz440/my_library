@@ -30,7 +30,10 @@ export const StatsSection = () => {
   }
   if (data) {
     return (
-      <div className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4 md:grid-cols-3">
+      <div
+        className="mx-auto mb-4 grid w-full max-w-screen-xl grid-cols-2 items-center justify-center gap-4 p-4 md:grid-cols-3"
+        id="stats"
+      >
         <ReadStats read={data.readBooks} all={data.totalBooks} />
         <RadialStats />
         <BarChartMonth />

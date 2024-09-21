@@ -6,7 +6,8 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { SignOutButton, SignInButton } from "@clerk/nextjs";
-import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, useUser } from "@clerk/clerk-react";
+import { setTheme as updateTheme } from "~/server/actions";
 
 export default function Profile() {
   const themes = [
@@ -64,10 +65,17 @@ export default function Profile() {
 const ThemeCircle = ({ theme }: { theme: string }) => {
   const { setTheme, theme: currentTheme } = useTheme();
   const [themeTrigger, setThemeTrigger] = useState(false);
+  const { user } = useUser();
 
-  const handleThemeChange = (theme: string) => {
+  const handleThemeChange = async (theme: string) => {
     setTheme(theme);
     setThemeTrigger(!themeTrigger);
+    const res = await updateTheme(theme, user!.id);
+    if (!res) {
+      console.log("fail to updat theme");
+    } else {
+      console.log("theme set successfully");
+    }
   };
 
   return (

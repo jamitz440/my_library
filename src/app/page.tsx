@@ -1,10 +1,11 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import { MenuBar } from "~/components/ui/menuBar/MenuBar";
 import { NavBar } from "~/components/ui/NavBar";
 import { LandingPage } from "~/components/ui/home/landingPage";
 import { StatsSection } from "~/components/ui/home/statsSection";
+import OnboardingOverlay from "~/components/ui/overlay";
 
 interface DimensionsStructured {
   length: {
@@ -45,7 +46,35 @@ export interface Book {
   isbn10: string;
 }
 
+const onboardingSteps = [
+  {
+    id: "step1",
+    description:
+      "This is the navigation bar where you can access different pages.",
+    highlightId: "navbar",
+  },
+  {
+    id: "step2",
+    description: "Here you can see your profile information.",
+    highlightId: "stats",
+  },
+];
+
 export default function Home() {
+  const [showOnboarding, setShowOnboarding] = useState(true);
+
+  const handleFinishOnboarding = () => {
+    setShowOnboarding(false);
+    // Optionally, save to localStorage to prevent showing again
+    localStorage.setItem("onboardingCompleted", "true");
+  };
+
+  useEffect(() => {
+    const completed = localStorage.getItem("onboardingCompleted");
+    if (completed) {
+      // setShowOnboarding(false);
+    }
+  }, []);
   return (
     <div className="bg-background">
       <NavBar selected="Home" />
@@ -55,6 +84,12 @@ export default function Home() {
       <SignedOut>
         <LandingPage />
       </SignedOut>
+      {showOnboarding && (
+        <OnboardingOverlay
+          steps={onboardingSteps}
+          onFinish={handleFinishOnboarding}
+        />
+      )}
       <MenuBar currentPage="Home" />
     </div>
   );

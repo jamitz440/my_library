@@ -10,7 +10,13 @@ import { faBadgeCheck } from "@awesome.me/kit-30477fcccd/icons/classic/solid";
 import { useState } from "react";
 import { Input } from "./input";
 
-export default function Books({ page }: { page: "wishlist" | "library" }) {
+export default function Books({
+  page,
+  children,
+}: {
+  page: "wishlist" | "library";
+  children?: React.ReactNode;
+}) {
   const [filter, setFilter] = useState("");
   const { data, error, isLoading } = useQuery({
     queryKey: [page],
@@ -45,6 +51,7 @@ export default function Books({ page }: { page: "wishlist" | "library" }) {
         <div className="mb-4 flex w-full items-center justify-center gap-4">
           <div>Search</div>
           <Input value={filter} onChange={(e) => setFilter(e.target.value)} />
+          {children}
         </div>
         <div className="mb-16 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {data

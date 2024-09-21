@@ -5,7 +5,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { getWishlist } from "~/server/actions";
+import { getUser, getWishlist } from "~/server/actions";
 import Books from "~/components/ui/Books";
 import {
   RedirectToSignIn,
@@ -15,6 +15,8 @@ import {
 } from "@clerk/nextjs";
 import { Card, CardContent, CardFooter } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
+import { auth } from "@clerk/nextjs/server";
+import CopyWishlistLinkButton from "~/components/ui/copyWishlistButton";
 
 export default async function Wishlist() {
   const queryClient = new QueryClient();
@@ -27,6 +29,8 @@ export default async function Wishlist() {
   } catch (error) {
     console.error("Error during prefetch:", error);
   }
+  const { userId } = auth();
+  const userinfo = await getUser(userId!);
 
   return (
     <div className="bg-background">
@@ -34,7 +38,11 @@ export default async function Wishlist() {
       <SignedIn>
         <div className="mx-auto max-w-screen-xl p-4">
           <HydrationBoundary state={dehydrate(queryClient)}>
-            <Books page="wishlist" />
+            <Books page="wishlist">
+              {userinfo?.wishlistLink && (
+                <CopyWishlistLinkButton wishlistLink={userinfo.wishlistLink} />
+              )}
+            </Books>
           </HydrationBoundary>
         </div>
       </SignedIn>

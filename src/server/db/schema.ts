@@ -52,13 +52,15 @@ export const books = createTable(
   }),
 );
 
-export const user = createTable(
-  "user",
+export const users = createTable(
+  "users",
   {
     id: serial("id").primaryKey().notNull(),
     user_id: varchar("user_id", { length: 256 }),
     goal: integer("goal"),
     theme: varchar("theme", { length: 256 }),
+    onboarding: boolean("onboarding").notNull(),
+    wishlistLink: varchar("wishlistLink"),
   },
   (example) => ({
     titleIndex: index("user_idx").on(example.user_id),

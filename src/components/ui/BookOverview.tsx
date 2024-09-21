@@ -27,6 +27,9 @@ export const BookOverview = ({ book, children }: BookOverviewProps) => {
           className={clsx({ "opacity-70": book.read }, "z-0")}
           src={book.image ?? "/default-book-cover.jpg"}
           fill
+          sizes="(max-width: 500px) 150px,
+                   (max-width: 800px) 200px,
+                   250px"
           alt={book.title}
         />
         {children}

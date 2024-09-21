@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ReactQueryProvider } from "./ReactQueryProvider";
 import { ThemeProvider } from "~/components/theme-provider";
 import type { Viewport } from "next";
+import { CheckSignedIn } from "../components/checkSignedIn";
 
 export const viewport: Viewport = {
   width: "device-width",

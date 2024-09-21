@@ -1,9 +1,9 @@
 "use server";
 
 import { db } from "./db";
-import { books } from "./db/schema";
+import { books, users } from "./db/schema";
 import { count, sql, eq, ne, and, gte, lte } from "drizzle-orm";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 
 export async function getLibrary() {
   const { userId } = auth();
@@ -34,10 +34,18 @@ export async function getWishlist() {
 
 export async function getSharedWishlist(id: string) {
   try {
+    const userData = await db
+      .select()
+      .from(users)
+      .where(eq(users.wishlistLink, id));
+    const user_id = userData[0]?.user_id;
+    if (!user_id) {
+      return { error: "No user id found" };
+    }
     const rawData = await db
       .select()
       .from(books)
-      .where(and(ne(books.owned, true), eq(books.user_id, id)));
+      .where(and(ne(books.owned, true), eq(books.user_id, user_id)));
 
     return rawData;
   } catch (error) {
@@ -164,4 +172,53 @@ export async function reserveBook(id: number, name: string) {
   } else {
     return { success: false };
   }
+}
+
+import { randomBytes } from "crypto";
+export async function checkSignIn(user_id: string) {
+  const res = await db.select().from(users).where(eq(users.user_id, user_id));
+
+  if (res.length === 0) {
+    const token = randomBytes(32).toString("base64url");
+    const newUser = await db.insert(users).values({
+      user_id: user_id,
+      onboarding: true,
+      wishlistLink: token,
+    });
+    if (newUser) {
+      return { success: true, info: "added new user to db" };
+    }
+  } else {
+    return { success: true, info: "user found" };
+  }
+}
+
+export async function getUsersName(id: string) {
+  const user = await clerkClient.users.getUser(id);
+
+  if (user) {
+    return { name: user.firstName };
+  } else {
+    {
+      error: "failed to fetch name";
+    }
+  }
+}
+
+export async function setTheme(theme: string, user_id: string) {
+  const res = await db
+    .update(users)
+    .set({ theme: theme })
+    .where(eq(users.user_id, user_id));
+  if (res) {
+    return { success: true };
+  } else {
+    return { success: false };
+  }
+}
+
+export async function getUser(user_id: string) {
+  const res = await db.select().from(users).where(eq(users.user_id, user_id));
+
+  return res[0]!;
 }
