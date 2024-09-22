@@ -34,6 +34,7 @@ import { BookSearchOverview } from "~/components/ui/BookSearchOverview";
 import { Checkbox } from "~/components/ui/checkbox";
 import { type books } from "~/server/db/schema";
 import { type InferSelectModel } from "drizzle-orm";
+import { X } from "lucide-react";
 
 type Book = InferSelectModel<typeof books>;
 
@@ -206,7 +207,15 @@ export default function Home() {
               setDialog(false);
             }}
           >
-            <DialogClose onClick={() => setDialog(false)} />
+            <DialogClose asChild>
+              <button
+                className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                onClick={() => setDialog(false)}
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </button>
+            </DialogClose>
             <DialogHeader>
               <DialogTitle className="text-secondary-foreground">
                 {search
@@ -307,7 +316,7 @@ export default function Home() {
         </Dialog>
         <div className="flex flex-grow flex-wrap">
           {results ? (
-            <div className="mb-16 grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            <div className="mx-auto mb-16 grid grid-cols-2 gap-4 pt-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {results
                 .reduce((uniqueBooks: Bookk[], b: Bookk) => {
                   const existingBook = uniqueBooks.find(

@@ -306,7 +306,7 @@ export default function BookPage({ params }: { params: { id: number } }) {
                 dangerouslySetInnerHTML={{
                   __html: book!.synopsis
                     ? book!.synopsis.replace(/<br\/>/g, "<br>")
-                    : "No review provided",
+                    : "No synopsis provided",
                 }}
               />
             </div>

@@ -7,6 +7,7 @@ import StarRating from "./StarRating";
 import { Skeleton } from "./skeleton";
 import clsx from "clsx";
 import Link from "next/link";
+import { Button } from "./button";
 type Book = InferSelectModel<typeof books>;
 
 interface BookOverviewProps {
@@ -19,7 +20,7 @@ export const BookOverview = ({ book, children }: BookOverviewProps) => {
     <Card key={book.title} className="relative flex h-full flex-col gap-2 p-2">
       <div
         className={clsx(
-          "group relative aspect-book w-full overflow-hidden rounded-sm rounded-e-xl hover:cursor-pointer",
+          "group relative aspect-book w-full overflow-hidden rounded-sm rounded-e-xl",
           { "bg-black": book.read },
         )}
       >
@@ -33,12 +34,12 @@ export const BookOverview = ({ book, children }: BookOverviewProps) => {
           alt={book.title}
         />
         {children}
-        <Link
+        {/*<Link
           href={`/book/${book.id}`} // Change the onClick to navigate to the dynamic page
           className="absolute bottom-0 z-10 flex h-full w-full select-none items-center justify-center bg-zinc-800/80 text-2xl font-bold text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100"
         >
           View book
-        </Link>
+        </Link>*/}
       </div>
       <div className="flex h-auto flex-col">
         <div className="flex max-w-full items-start justify-start whitespace-nowrap text-sm font-bold">
@@ -50,8 +51,8 @@ export const BookOverview = ({ book, children }: BookOverviewProps) => {
             : "Unknown Author"}
         </div>
 
-        <div className="mt-4 flex w-full items-center justify-center">
-          {book.owned && (
+        {book.owned && (
+          <div className="mt-4 flex w-full items-center justify-center">
             <StarRating
               onSetRating={() => null}
               size={24}
@@ -59,8 +60,11 @@ export const BookOverview = ({ book, children }: BookOverviewProps) => {
               defaultRating={book.rating!}
               dynamic={false}
             />
-          )}
-        </div>
+          </div>
+        )}
+        <Link href={`/book/${book.id}`}>
+          <Button className={"mt-4 w-full"}>View Book </Button>
+        </Link>
       </div>
     </Card>
   );
