@@ -132,7 +132,7 @@ export default function BookPage({ params }: { params: { id: number } }) {
         throw new Error("Failed to delete the book");
       }
       toast({ title: `${book?.title} successfully deleted` });
-      router.push("/library"); // Redirect to a specific page
+      router.back(); // Redirect to a specific page
     } catch (error) {
       console.error(error);
       toast({
@@ -298,6 +298,17 @@ export default function BookPage({ params }: { params: { id: number } }) {
               ) : (
                 <p>{formData.review || "No review provided"}</p>
               )}
+            </div>
+            <div className="mt-4">
+              <label htmlFor="review">Synopsis:</label>
+
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: book!.synopsis
+                    ? book!.synopsis.replace(/<br\/>/g, "<br>")
+                    : "No review provided",
+                }}
+              />
             </div>
 
             {/* Save Button */}

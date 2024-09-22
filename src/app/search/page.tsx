@@ -120,10 +120,10 @@ export default function Home() {
     }
   };
 
-  const handleAdd = async () => {
+  const handleAdd = async (type: "wishlist" | "library") => {
     if (!user) {
       toast({
-        title: `Sign in to add a book to your library`,
+        title: `Sign in to add a book to your ${type}`,
         variant: "destructive",
       });
       return;
@@ -134,11 +134,11 @@ export default function Home() {
         book: book,
         user_id: user?.id,
         read: checked,
-        owned: owned,
+        owned: type == "library",
       }),
     });
     toast({
-      title: `Added to Library`,
+      title: `Added to ${type}`,
       description: `${book?.title} - ${book?.authors ? book?.authors[0] : ""}`,
     });
     await queryClient.invalidateQueries({ queryKey: ["library"] });
@@ -242,7 +242,7 @@ export default function Home() {
                   >
                     Mark as read
                   </label>
-                  <Checkbox
+                  {/* <Checkbox
                     id="owned"
                     checked={owned}
                     onClick={() => setOwned(!owned)}
@@ -252,20 +252,20 @@ export default function Home() {
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     Mark as owned
-                  </label>
+                  </label> */}
                 </div>
               </div>
             </div>
             <div className="flex w-full justify-around gap-4">
               <Button
                 variant={"secondary"}
-                onClick={handleReset}
+                onClick={() => handleAdd("wishlist")}
                 className="w-full"
               >
-                {`No, that's not right!`}
+                {`Add to My Wishlist!`}
               </Button>
-              <Button className="w-full" onClick={handleAdd}>
-                {`Add to MyLibrary! `}
+              <Button className="w-full" onClick={() => handleAdd("library")}>
+                {`Add to My Library! `}
               </Button>
             </div>
           </DialogContent>
@@ -294,13 +294,13 @@ export default function Home() {
             <div className="flex w-full justify-around gap-4">
               <Button
                 variant={"secondary"}
-                onClick={handleReset}
+                onClick={() => handleAdd("wishlist")}
                 className="w-full"
               >
-                {`No, that's not right!`}
+                {`Add to My Wishlist!`}
               </Button>
-              <Button className="w-full" onClick={handleAdd}>
-                {`Add to MyLibrary! `}
+              <Button className="w-full" onClick={() => handleAdd("library")}>
+                {`Add to My Library! `}
               </Button>
             </div>
           </DialogContent>
